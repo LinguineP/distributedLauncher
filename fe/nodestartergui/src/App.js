@@ -14,9 +14,7 @@ function App() {
   const stopDiscoveryText="Stop discovery";
   
 
-  const [availableNodes,setAvailableNodes]=useState([new runnableNode("192.156.1.10",1,"this pc0"),
-  new runnableNode("192.156.1.11",2,"this pc1"),
-  new runnableNode("192.156.1.12",3,"this pc2")]);
+  const [availableNodes,setAvailableNodes]=useState([]);
   const [selectedNodes,setSelectedNodes]=useState([]);
 
   var selectedScript="";
@@ -64,6 +62,8 @@ function App() {
     console.log(availableNodes);
   };
 
+
+
   const itemWasClickedSelected = (item) => {
     console.log(`Item with hostName ${item.hostName} and IP ${item.ip} was clicked`);
     const updatedSelectedNodes = selectedNodes.filter((listItem) => listItem !== item);
@@ -92,29 +92,28 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-       <p className='buttonText'>Welcome to script starter</p>
+       <p className='buttonText'>Welcome to distributed app starter</p>
        <button onClick={discovery} className="Action-button"><p className='Button-text'>{discoveryOn ? stopDiscoveryText : startDiscoveryText}</p></button>
        
        <div className="selectionOutline">
         <div className="halfDiv">
           <p>Available Nodes</p>
           <hr></hr>
-          <RunnableNodeList items={availableNodes} onItemClick={itemWasClickedAvailable}>
-
+          <RunnableNodeList items={availableNodes}  script={false} onItemClick={itemWasClickedAvailable}>
           </RunnableNodeList>
         </div>
         <div className="halfDiv">
           <p>Selected Nodes</p>
           <hr></hr>
-          <RunnableNodeList items={selectedNodes} onItemClick={itemWasClickedSelected}>
+          <RunnableNodeList items={selectedNodes} script={false} onItemClick={itemWasClickedSelected}>
           </RunnableNodeList>
         </div>
        </div>
        <div className="availableScripts">
         
-          <p>Available Nodes</p>
+          <p>Available Scripts</p>
           <hr></hr>
-          <RunnableNodeList items={availableScripts} onItemClick={itemWasClickedScript}>
+          <RunnableNodeList items={availableScripts} script={true} onItemClick={itemWasClickedScript}>
 
           </RunnableNodeList>      
        </div>
