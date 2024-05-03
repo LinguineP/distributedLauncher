@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const RunnableNodeList = ({ items, onItemClick }) => {
+const RunnableNodeList = ({ items, onItemClick,script }) => {
   const [lastClickedItem, setLastClickedItem] = useState(null);
 
   const handleItemClick = (item) => {
@@ -10,7 +10,7 @@ const RunnableNodeList = ({ items, onItemClick }) => {
 
   return (
     <ul>
-    {items.map((item, index,script) => {
+    {items.map((item, index) => {
       if (script) {
         return (
           <li
@@ -30,7 +30,7 @@ const RunnableNodeList = ({ items, onItemClick }) => {
             key={index}
             onClick={() => handleItemClick(item)}
           >
-            <strong>{item.hostName}</strong>: {item.ip}
+            <strong>{item.hostname}</strong>: {item.ip}
           </li>
         );
       }

@@ -1,7 +1,6 @@
 import './App.css';
 import { React, useState } from 'react';
 import RunnableNodeList from './runnablenodeList/RunnableNodeListComponent';
-import runnableNode from './models/runnableNode.ts';
 import CommunicationHandler from './communicationHandlers/communicationHandler.ts'
 
 
@@ -17,7 +16,7 @@ function App() {
   const [availableNodes,setAvailableNodes]=useState([]);
   const [selectedNodes,setSelectedNodes]=useState([]);
 
-  var selectedScript="";
+ 
 
   const [availableScripts,setAvailableScripts]=useState([])
   
@@ -29,26 +28,37 @@ function App() {
       requestHandler.startScan();
       return
     }
-    const response=requestHandler.stopScan();
+    const response=await requestHandler.stopScan();
+    console.log(response)
+
+
     setAvailableNodes(response.availableNodes);
     setAvailableScripts(response.availableScripts);
+  
     console.log(true)
   };
   
   const startRemote=async()=>{
-    
+    let numberOfNodes;
     if (inputValue.trim() !== '') {
-      setNumber(parseInt(inputValue));
-      setInputValue('');
+      numberOfNodes=parseInt(inputValue)
+      setNumber(parseInt(numberOfNodes));
     }
+
+
+  
+
     const requestParams={
-                          selectedScript:selectedScript,
-                          selectedNumberOfNodes:number,
-                          selectedNodes:selectedNodes  
+                          selectedScript:lastClickedItem,
+                          selectedNumberOfNodes:numberOfNodes,
+                          selectedNodes:selectedNodes 
                         }
     requestHandler.startNodes(requestParams);
                 
   };
+
+
+
 
     const itemWasClickedAvailable = (item) => {
     console.log(`Item with hostName ${item.hostName} and IP ${item.ip} was clicked`);
@@ -76,9 +86,17 @@ function App() {
   };
   
 
-  const itemWasClickedScript=(item)=>{
-    selectedScript=item.ScriptName;
-  }
+
+  
+
+  const [lastClickedItem, setLastClickedItem] = useState(null);
+
+
+  
+  const itemWasClickedScript = (item) => {
+    setLastClickedItem(item)
+  };
+  
 
   const [number, setNumber] = useState(null);
   const [inputValue, setInputValue] = useState('');
@@ -113,25 +131,33 @@ function App() {
         
           <p>Available Scripts</p>
           <hr></hr>
-          <RunnableNodeList items={availableScripts} script={true} onItemClick={itemWasClickedScript}>
+          <RunnableNodeList items={availableScripts} script={true} onItemClick={itemWasClickedScript} lastClickedItem={lastClickedItem} 
+  setLastClickedItem={setLastClickedItem}>
 
           </RunnableNodeList>      
        </div>
           <div className="selectionOutline">
             <div className="altHalfDiv">
-            <label>
-              Enter number of nodes:
-              <input
-                type="number"
-                value={inputValue}
-                onChange={handleChange}
-              />
-            </label>
-          </div>
-          
-          {number && <p>You entered: {number}</p>}
+              {
+                <div className='center-div'>
+                   <label>
+                      Enter number of nodes:
+                      
+                      <input 
+                        type="number"
+                        value={inputValue}
+                        onChange={handleChange}
+                      />
+                    </label>
+                </div>
+              }
+               
+            </div>
+
           <div className="altHalfDiv">
-          <button onClick={startRemote} className="Action-button"><p className='Button-text'>Start Scripts</p></button>
+            <div class="center-div">
+              <button onClick={startRemote} className="Action-button"><p className='Button-text'>Start Scripts</p></button>
+            </div>
           </div>
         </div>
       </header>

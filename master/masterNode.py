@@ -1,23 +1,26 @@
-from flask import Flask, render_template,jsonify
+from flask import Flask, render_template,jsonify, request
+
 from modules import asyncBeaconRoutines as asyncBeacon
+from modules import dataProcessing
 import multiprocessing as mp
 import socket
 
 app = Flask(__name__, static_folder="static/static", template_folder="static")
 
+
 masterIp=''
 nodesAlive=[]
 
-@app.route("/api/stopScan")
+@app.route("/api/stopScan",methods=['GET'])
 def stopScan():
     if  beacon.is_alive():
         asyncBeacon.stop_beacon(stop_event=stop_event)  
-        asyncBeacon
         nodesAlive:list=parent_end.recv()
-        response={"message": "Worker stopped.","nodes":nodesAlive}
+        availableScripts:list=dataProcessing.getAvailableScripts()
+        response={"message": "Worker stopped.","availableNodes":nodesAlive ,"availableScripts":availableScripts}
         return jsonify(response)
 
-@app.route("/api/startScan")
+@app.route("/api/startScan",methods=['GET'])
 def startScan():
     global listener,beacon, stop_event,parent_end
     parent_end,child_end= mp.Pipe();
@@ -29,10 +32,12 @@ def startScan():
     return jsonify({"message": "Worker started."})
 
 
-@app.route("/api/startNodes")
+@app.route("/api/startNodes",methods=['POST'])
 def startNodes():
     #TODO: issue start command
-    pass
+    data = request.get_json()
+    print(data)
+    return 'Success', 200
     
 
 

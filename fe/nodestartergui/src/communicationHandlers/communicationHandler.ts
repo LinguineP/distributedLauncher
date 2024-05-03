@@ -2,7 +2,7 @@ import axios from "axios";
 
 class CommunicationHandler {
   stopScan() {
-    axios
+    return axios
       .get("/api/stopScan")
       .then(function (response) {
         console.log(response);
@@ -17,7 +17,7 @@ class CommunicationHandler {
     axios
       .get("api/startScan")
       .then(function (response) {
-        return response;
+        return response.data;
       })
       .catch(function (error) {
         console.log(error);

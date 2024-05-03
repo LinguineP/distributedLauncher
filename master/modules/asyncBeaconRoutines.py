@@ -1,6 +1,7 @@
 import asyncio
 import time
 import messagingHandler as msg 
+from dataProcessing import * 
 
 
 def beacon_process(stop_event):
@@ -21,12 +22,10 @@ def incomingListener_process(stop_event,pipe_end):
 async def incomingListener(stop_event,pipe_end):
     inNodes=[]
     while not stop_event.is_set():
-        response=msg.receive_discovery()
+        success,result=hello_processing(msg.receive_discovery())
         #TODO filter by message and pass
-        if response:
-            inNodes.append(response)    
-
-    print(inNodes)
+        if success:
+            inNodes.append(result)    
     pipe_end.send(inNodes)
     
 
