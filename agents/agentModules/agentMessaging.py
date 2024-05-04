@@ -5,7 +5,7 @@ import socket
 
 multicastGroup = '224.1.1.1'
 portMulticast = 5001 #not a known port number
-masterPort=5002
+portComm=5002
 masterIp=''
 
 
@@ -48,6 +48,9 @@ def server_ping():
     pass
 
 
+
+
+
 def send_json(dest_ip, dest_port, data_dict):
     # Convert the dictionary to JSON
     json_data = json.dumps(data_dict)
@@ -64,8 +67,26 @@ def send_json(dest_ip, dest_port, data_dict):
         client_socket.sendall(json_data.encode("utf-8"))
         print("JSON data sent successfully.")
     finally:
-        client_socket.close();
+        client_socket.close()
 
+
+
+def receive_command():
+    agent_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    agent_socket.bind((masterIp, portComm))
+    agent_socket.listen(1)
+
+    try:
+        master_socket, master_address = agent_socket.accept()
+
+        json_data=receive_json(master_socket)
+        print("Received JSON:", json_data)
+        return json_data
+    except Exception as e:
+        #print("Error:", e)
+        pass
+    finally:
+        agent_socket.close()
 
 def receive_json(socket):
         data = b""
@@ -82,7 +103,7 @@ def receive_json(socket):
 
 def send_hello():
     hello_msg={"message":cfg['authentication']['stored_hello_message'],
-               "pass":cfg['authentication']['stored_hello_pass'],
-              "ip":agentIp,
-              "hostname":socket.gethostname()}
-    send_json(masterIp,masterPort,hello_msg)
+                "pass":cfg['authentication']['stored_hello_pass'],
+                "ip":agentIp,
+                "hostname":socket.gethostname()}
+    send_json(masterIp,portComm,hello_msg)

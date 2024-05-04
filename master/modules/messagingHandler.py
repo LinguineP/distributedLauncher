@@ -31,23 +31,23 @@ def send_ip_to_multicast():
 
 def receive_discovery():
     
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind((masterIp, portComm))
-    server_socket.listen(1)
+    master_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    master_socket.bind((masterIp, portComm))
+    master_socket.listen(1)
 
     try:
-        server_socket.settimeout(connectionTimeout) # Set a timeout for accept() polling because accept is blocking
+        master_socket.settimeout(connectionTimeout) # Set a timeout for accept() polling because accept is blocking
                                                     #this handles that there are no new connections after the discovry has been stopped
-        client_socket, client_address = server_socket.accept()
+        agent_socket, agent_address = master_socket.accept()
 
-        json_data=receive_json(client_socket)
+        json_data=receive_json(agent_socket)
         print("Received JSON:", json_data)
         return json_data
     except Exception as e:
         #print("Error:", e)
         pass
     finally:
-        server_socket.close()
+        master_socket.close()
 
 
 def receive_json(socket):
@@ -61,5 +61,31 @@ def receive_json(socket):
         json_data = json.loads(data.decode("utf-8"))
         print("Received JSON:", json_data)
         return json_data
-        
+
+def send_start(dest_ip,script,numberOfNodes,nodeId,masterNodeId,masterNodeIp,decent):
+    message={'message':'start_node',
+             'script':script,
+             'numberOfNodes':numberOfNodes,
+             'currentNodeId':nodeId,
+             'masterNodeId':masterNodeId,
+             'masterNodeIp':masterNodeIp,
+             'decent':decent}
+    send_json(dest_ip,portComm,message)
+
     
+
+def send_json(dest_ip,dest_port,data_dict):
+    # Convert the dictionary to JSON
+    json_data = json.dumps(data_dict)
+    
+    # Create a socket object
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        # Connect to the server
+        client_socket.connect((dest_ip,dest_port))
+        
+        # Send the JSON data
+        client_socket.sendall(json_data.encode("utf-8"))
+        print("JSON data sent successfully.")
+    finally:
+        client_socket.close();

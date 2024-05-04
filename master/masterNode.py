@@ -2,6 +2,7 @@ from flask import Flask, render_template,jsonify, request
 
 from modules import asyncBeaconRoutines as asyncBeacon
 from modules import dataProcessing
+from modules import executionRoutines
 
 import multiprocessing as mp
 import socket
@@ -14,11 +15,13 @@ nodesAlive=[]
 
 @app.route("/api/stopScan",methods=['GET'])
 def stopScan():
+    global nodesAlive
     if  beacon.is_alive():
         asyncBeacon.stop_beacon(stop_event=stop_event)  
-        nodesAlive:list=parent_end.recv()
+        nodesAlive=parent_end.recv()
         availableScripts:list=dataProcessing.getAvailableScripts()
         response={"message": "Worker stopped.","availableNodes":nodesAlive ,"availableScripts":availableScripts}
+
         return jsonify(response)
 
 @app.route("/api/startScan",methods=['GET'])
@@ -37,10 +40,16 @@ def startScan():
 def startNodes():
     #TODO: issue start command
     data = request.get_json()
-    print(data)
+    #example data {'startParams': {'selectedScript': None, 'selectedNumberOfNodes': 2, 'selectedNodes': [{'hostname': 'pv_t480s', 'ip': '192.168.0.24'}]}} incoming data example
+    executionRoutines.startScripts(data['startParams'])
+    
     return 'Success', 200
     
 
+@app.route("/api/shutdownAgents")
+def shudownAgents():
+    #TODO : add node stopping to frontend look at app.js todos
+    executionRoutines.shutdownAgentsGracefully(nodesAlive)
 
 
 @app.route("/")

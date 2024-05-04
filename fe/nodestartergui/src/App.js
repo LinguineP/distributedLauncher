@@ -105,7 +105,7 @@ function App() {
     setInputValue(e.target.value);
   };
 
-  
+  /* TODO: add a shutdown nodes button, number of nodes >= selected Nodes , cent/decent choice, maybe check nodes health toast  */
 
   return (
     <div className="App">

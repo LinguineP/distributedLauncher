@@ -9,13 +9,21 @@ def discovery():
     master_ip=ops.connect()
     masterIpStore[masterIpKey]=master_ip
 
+def execution():
+    return ops.wait_for_instructions()
+
 def agentProcess():
-    while True:
+    agent_active=True
+    while agent_active:
         #TODO: ping master address change
         if masterIpKey not in masterIpStore:
             discovery()
-        print("hello i am ready for routine")
-        time.sleep(10)
+        
+        agent_active=execution() 
+
+        
+
+        
 
 
 
