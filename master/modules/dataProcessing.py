@@ -1,9 +1,7 @@
 
+import os
+from config import *
 
-
-
-stored_hello_message='hello_from_agent'
-stored_hello_pass='bletchelyPark'
 
 
 
@@ -18,16 +16,23 @@ def decription():
 
 
 def authentication_hello(rcv_message):
-    if rcv_message['message']!=stored_hello_message or rcv_message['pass']!=stored_hello_pass:
+    if rcv_message['message']!=cfg['authentication']['stored_hello_message'] or rcv_message['pass']!=cfg['authentication']['stored_hello_pass']:
         print("Wrong credentials")
         return False
     return True
 
 
-
+def get_files(path):
+    for file in os.listdir(path):
+        if os.path.isfile(os.path.join(path, file)) and file.endswith('.py') and not file.startswith(('.', '_')):
+            yield file
 
 def getAvailableScripts():
-    return ["hello", "world"];
+    scripts=[] #it is assumed that the the script names are consistent across nodes, there are no duplicate scripts and proper paths  to scripts are given in cfg
+    for path in cfg['scriptPaths']:
+        scripts.extend(get_files(path))
+    
+    return scripts
 
 def formStartMessage():
     pass
@@ -51,7 +56,6 @@ def hello_processing(hello_message):
     all(map(hello_message.pop,['message','pass']))  
 
     return True,hello_message
-    
 
 
 

@@ -1,6 +1,6 @@
 import json
 import socket
-
+from config import *
 import socket
 
 multicastGroup = '224.1.1.1'
@@ -81,8 +81,8 @@ def receive_json(socket):
 
 
 def send_hello():
-    hello_msg={"message":"hello_from_agent",
-               "pass":"bletchelyPark",
+    hello_msg={"message":cfg['authentication']['stored_hello_message'],
+               "pass":cfg['authentication']['stored_hello_pass'],
               "ip":agentIp,
               "hostname":socket.gethostname()}
     send_json(masterIp,masterPort,hello_msg)

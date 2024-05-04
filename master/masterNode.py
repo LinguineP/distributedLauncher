@@ -44,7 +44,6 @@ def startNodes():
 
 @app.route("/")
 def index():
-    #TODO: fix avail node json mappings
     return render_template('index.html')
 
 
