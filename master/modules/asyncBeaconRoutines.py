@@ -23,7 +23,6 @@ async def incomingListener(stop_event,pipe_end):
     inNodes=[]
     while not stop_event.is_set():
         success,result=hello_processing(msg.receive_discovery())
-        #TODO filter by message and pass
         if success:
             inNodes.append(result)    
     pipe_end.send(inNodes)
