@@ -5,7 +5,7 @@ cfg = {
         'stored_hello_message':'hello_from_agent',
         'stored_hello_pass':'bletchelyPark'
     },
-    'scriptPaths':[]
+    'baseProjectPath':'D:\fax\diplomski\ptbfla2.0'
 
 
 }

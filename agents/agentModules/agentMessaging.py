@@ -1,6 +1,6 @@
 import json
 import socket
-from config import *
+from agentConfig import *
 import socket
 
 multicastGroup = '224.1.1.1'
