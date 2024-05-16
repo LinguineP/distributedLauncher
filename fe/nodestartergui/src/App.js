@@ -40,10 +40,10 @@ function App() {
   
   const startRemote=async()=>{
     let numberOfNodes;
-    if (inputValue.trim() !== '') {
-      numberOfNodes=parseInt(inputValue)
+    //if (inputValue.trim() !== '') {
+      //numberOfNodes=parseInt(inputValue)
       setNumber(parseInt(numberOfNodes));
-    }
+    //}
 
 
   
@@ -51,13 +51,22 @@ function App() {
     const requestParams={
                           selectedScript:lastClickedItem,
                           selectedNumberOfNodes:numberOfNodes,
-                          selectedNodes:selectedNodes 
+                          selectedNodes:selectedNodes ,
+                          decentSelected:isToggled
                         }
     requestHandler.startNodes(requestParams);
                 
   };
 
 
+  const stopRemote=async()=>{
+
+    const requestParams={
+                          selectedNodes:selectedNodes 
+                        }
+    requestHandler.stopNodes(requestParams);
+                
+  };
 
 
     const itemWasClickedAvailable = (item) => {
@@ -98,11 +107,23 @@ function App() {
   };
   
 
-  const [number, setNumber] = useState(null);
-  const [inputValue, setInputValue] = useState('');
+  const [isToggled, setIsToggled] = useState(false);
 
-  const handleChange = (e) => {
-    setInputValue(e.target.value);
+  const handleToggle = () => {
+    setIsToggled(!isToggled);
+  };
+
+  const [number, setNumber] = useState(null);
+  const [inputValue, setInputValue] = useState(0);
+
+  const handleChange = (event) => {
+    const value = parseInt(event.target.value, 10);
+    const minValue = selectedNodes.length;
+    if (value >= minValue) {
+      setInputValue(value);
+    } else {
+      setInputValue(minValue);
+    }
   };
 
   /* TODO: add a shutdown nodes button, number of nodes >= selected Nodes , cent/decent choice, maybe check nodes health toast  */
@@ -139,26 +160,47 @@ function App() {
           <div className="selectionOutline">
             <div className="altHalfDiv">
               {
-                <div className='center-div'>
-                   <label>
-                      Enter number of nodes:
-                      
-                      <input 
-                        type="number"
-                        value={inputValue}
-                        onChange={handleChange}
-                      />
-                    </label>
+
+                <div className="selectionOutline">
+                  <div className="altHalfDiv">
+                    <div className='center-div'>
+                      <label>
+                          Enter number of nodes:
+                       <input
+                          type="number"
+                          value={inputValue}
+                          onChange={handleChange} />
+                      </label>
+                  </div>
                 </div>
+                <div className="altHalfDiv">
+                  <div className='center-div'>
+                      <div className="toggle-switch">
+                      <p>{isToggled ? 'Decentralised' : 'Centralised'}</p>
+                        <label className="switch">
+                          <input type="checkbox" checked={isToggled} onChange={handleToggle} />
+                          <span className="slider"></span>
+                        </label>
+                      </div>
+                  </div>
+                </div></div>
               }
                
             </div>
-
-          <div className="altHalfDiv">
-            <div class="center-div">
-              <button onClick={startRemote} className="Action-button"><p className='Button-text'>Start Scripts</p></button>
+            <div className="altHalfDiv">
+              <div className="selectionOutline">
+                  <div className="altHalfDiv">
+                    <div className="center-div">
+                      <button onClick={startRemote} className="Action-button"><p className='Button-text'>Start Scripts</p></button>
+                    </div>
+                  </div>
+                  <div className="altHalfDiv">
+                    <div className="center-div">
+                      <button onClick={stopRemote} className="Action-button"><p className='Button-text'>Shutdown Nodes</p></button>
+                    </div>
+                  </div>
+              </div>
             </div>
-          </div>
         </div>
       </header>
     </div>
