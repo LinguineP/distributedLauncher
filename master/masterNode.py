@@ -15,7 +15,7 @@ nodesAlive=[]
 
 @app.route("/api/stopScan",methods=['GET'])
 def stopScan():
-    global nodesAlive
+    global nodesAlive,beacon
     if  beacon.is_alive():
         asyncBeacon.stop_beacon(stop_event=stop_event)  
         nodesAlive=parent_end.recv()

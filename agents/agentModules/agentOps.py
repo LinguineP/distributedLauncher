@@ -15,7 +15,7 @@ def decent_start(script,numberOfNodes,currentNodeId,masterNodeIp):
     handler=ShellHandler()
     
     runDecentCmd = (f'{handler.pythonCmd}' f' ' 
-                    f'{utils.find_script( utils.escape_chars(agentConfig.cfg['baseProjectPath']),script)}' f' '
+                    f"{utils.find_script( utils.escape_chars(agentConfig.cfg['baseProjectPath']),script)}" f' '
                     f'{numberOfNodes}' f' '
                     f'{currentNodeId}' f' '
                     f'{masterNodeIp}' )
@@ -30,7 +30,7 @@ def cent_start(script,numberOfNodes,currentNodeId,masterNodeId,masterNodeIp):
     handler=ShellHandler()
     
     runDecentCmd = (f'{handler.pythonCmd}' f' ' 
-                    f'{utils.find_script( utils.escape_chars(agentConfig.cfg['baseProjectPath']),script)}' f' '
+                    f"{utils.find_script( utils.escape_chars(agentConfig.cfg['baseProjectPath']),script)}" f' '
                     f'{numberOfNodes}' f' '
                     f'{currentNodeId}' f' '
                     f'{masterNodeId}' f' '

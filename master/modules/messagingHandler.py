@@ -2,9 +2,9 @@ import socket
 import json
 
 
-multicastGroup = '224.1.1.1' # not in  the reserved range 
-portMulticast = 5001 #not a known port number
-portComm=5002  #separate port for direct communication 
+multicastGroup = '239.255.10.1' # reserved range for local assignment by IANA
+portMulticast = 55001 #not a known port number
+portComm=55002  #separate port for direct communication 
 connectionTimeout=0.5
 masterIp = ''
 
@@ -22,18 +22,22 @@ def get_local_ip():
         return None
 
 def send_ip_to_multicast():
+    global portMulticast,masterIp
     masterIp=get_local_ip();
     message = masterIp.encode('utf-8')
     multicast_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    multicast_socket.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 3)
+    multicast_socket.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 1)
+
     multicast_socket.sendto(message, (multicastGroup, portMulticast))
     multicast_socket.close()    
 
 def receive_discovery():
-    
+    global masterIp
     master_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     master_socket.bind((masterIp, portComm))
     master_socket.listen(1)
+
+
 
     try:
         master_socket.settimeout(connectionTimeout) # Set a timeout for accept() polling because accept is blocking

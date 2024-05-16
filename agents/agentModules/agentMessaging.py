@@ -3,9 +3,9 @@ import socket
 from agentConfig import *
 import socket
 
-multicastGroup = '224.1.1.1'
-portMulticast = 5001 #not a known port number
-portComm=5002
+multicastGroup = '239.255.0.0'
+portMulticast = 55001 #not a known port number
+portComm=55002
 masterIp=''
 
 

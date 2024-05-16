@@ -1,5 +1,5 @@
 import subprocess
-import agents.agentModules.agentConfig as agentConfig
+import agentModules.agentConfig as agentConfig
 
 class ShellHandler:
 
@@ -12,7 +12,7 @@ class ShellHandler:
         self.process = None
         self.pythonCmd=''
         self.shell_setup=False
-        self.open_shell()
+        self.open_shell('')
 
     def open_shell(self, command):
         self.process = subprocess.Popen(command,cwd=agentConfig.cfg['baseProjectPath'], shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
@@ -21,7 +21,8 @@ class ShellHandler:
         if self.process:
             self.process.stdin.write(command + '\n')
             if(command!=''):
-                self.process.stdin.flush()
+                pass
+               # self.process.stdin.flush()
 
     def read_output(self):
         if self.process:
