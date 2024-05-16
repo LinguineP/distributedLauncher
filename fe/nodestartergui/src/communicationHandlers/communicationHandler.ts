@@ -24,6 +24,8 @@ class CommunicationHandler {
       });
   }
 
+
+
   startNodes(startParams) {
     const data = {
       startParams: startParams,
@@ -38,6 +40,22 @@ class CommunicationHandler {
         console.log(error);
       });
   }
+
+  stopNodes(stopParams) {
+    const data = {
+      stopParams: stopParams,
+    };
+
+    axios
+      .post("/api/shutdownAgents", data)
+      .then(function (response) {
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
+
 }
 
 export default CommunicationHandler;

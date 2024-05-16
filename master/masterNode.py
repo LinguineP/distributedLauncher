@@ -1,4 +1,4 @@
-from flask import Flask, render_template,jsonify, request
+from flask import Flask, render_template, jsonify, request
 
 from modules import asyncBeaconRoutines as asyncBeacon
 from modules import dataProcessing
@@ -10,10 +10,11 @@ import socket
 app = Flask(__name__, static_folder="static/static", template_folder="static")
 
 
-masterIp=''
-nodesAlive=[]
+masterIp = ""
+nodesAlive = []
 
-@app.route("/api/stopScan",methods=['GET'])
+
+@app.route("/api/stopScan", methods=["GET"])
 def stopScan():
     global nodesAlive,beacon
     if  beacon.is_alive():
@@ -24,44 +25,46 @@ def stopScan():
 
         return jsonify(response)
 
-@app.route("/api/startScan",methods=['GET'])
+
+@app.route("/api/startScan", methods=["GET"])
 def startScan():
-    global listener,beacon, stop_event,parent_end
-    parent_end,child_end= mp.Pipe();
+    global listener, beacon, stop_event, parent_end
+    parent_end, child_end = mp.Pipe()
     stop_event = mp.Event()
-    listener = mp.Process(target=asyncBeacon.incomingListener_process, args=(stop_event,child_end))
+    listener = mp.Process(
+        target=asyncBeacon.incomingListener_process, args=(stop_event, child_end)
+    )
     beacon = mp.Process(target=asyncBeacon.beacon_process, args=(stop_event,))
     listener.start()
     beacon.start()
     return jsonify({"message": "Worker started."})
 
 
-@app.route("/api/startNodes",methods=['POST'])
+@app.route("/api/startNodes", methods=["POST"])
 def startNodes():
-    #TODO: issue start command
+    # TODO: issue start command
     data = request.get_json()
-    #example data {'startParams': {'selectedScript': None, 'selectedNumberOfNodes': 2, 'selectedNodes': [{'hostname': 'pv_t480s', 'ip': '192.168.0.24'}]}} incoming data example
-    executionRoutines.startScripts(data['startParams'])
-    
-    return 'Success', 200
-    
+    # example data {'startParams': {'selectedScript': None, 'selectedNumberOfNodes': 2, 'selectedNodes': [{'hostname': 'pv_t480s', 'ip': '192.168.0.24'}]}} incoming data example
+    executionRoutines.startScripts(data["startParams"])
+
+    return "Success", 200
+
 
 @app.route("/api/shutdownAgents")
 def shudownAgents():
-    #TODO : add node stopping to frontend look at app.js todos
+    # TODO : add node stopping to frontend look at app.js todos
     executionRoutines.shutdownAgentsGracefully(nodesAlive)
 
 
+# TODO: define cent decent choice in fe,currently hardcoded do docsstrings for masternode
 @app.route("/")
 def index():
-    return render_template('index.html')
+    return render_template("index.html")
 
 
-
-
-
+# TODO: implement some kind of encription and probably digital signitures
 if __name__ == "__main__":
 
-    print('Starting masterNode')
-    app.debug=True
-    app.run(host='0.0.0.0',port=8080)
+    print("Starting masterNode")
+    app.debug = True
+    app.run(host="0.0.0.0", port=8080)
