@@ -55,10 +55,7 @@ class MulticastSocket:
                 new_socket.bind((iface_ip, self.port))
 
                 self.add_memberships(
-                    new_socket,
-                    self.multicast_ips,
-                    self.iface_infos[iface_ip],
-                    self.addr_family,
+                    new_socket, [multicast_ip], self.iface_infos[iface_ip]
                 )
 
                 # On Windows, by default, sent packets are looped back to local sockets on the same interface, even for interfaces
@@ -133,14 +130,14 @@ class MulticastSocket:
     def add_memberships(
         self,
         multicast_socket: socket.socket,
-        multicast_ips: List[str],
+        multicast_ip: List[str],
         interface_info: InterfaceInfo,
     ) -> None:
         """
         Add a non-source-specific membership (getting packages from all adresses publishing to that group) on the given socket.
         """
 
-        for multicast_addr in multicast_ips:
+        for multicast_addr in multicast_ip:
             if sys.platform == "win32":
                 # as per: https://docs.microsoft.com/en-us/windows/win32/winsock/ipproto-ip-socket-options
                 # struct packin for windows

@@ -16,12 +16,16 @@ nodesAlive = []
 
 @app.route("/api/stopScan", methods=["GET"])
 def stopScan():
-    global nodesAlive,beacon
-    if  beacon.is_alive():
-        asyncBeacon.stop_beacon(stop_event=stop_event)  
-        nodesAlive=parent_end.recv()
-        availableScripts:list=dataProcessing.getAvailableScripts()
-        response={"message": "Worker stopped.","availableNodes":nodesAlive ,"availableScripts":availableScripts}
+    global nodesAlive, beacon
+    if beacon.is_alive():
+        asyncBeacon.stop_beacon(stop_event=stop_event)
+        nodesAlive = parent_end.recv()
+        availableScripts: list = dataProcessing.getAvailableScripts()
+        response = {
+            "message": "Worker stopped.",
+            "availableNodes": nodesAlive,
+            "availableScripts": availableScripts,
+        }
 
         return jsonify(response)
 
@@ -50,10 +54,55 @@ def startNodes():
     return "Success", 200
 
 
-@app.route("/api/shutdownAgents")
+@app.route("/api/shutdownAgents", methods=["POST"])
 def shudownAgents():
     # TODO : add node stopping to frontend look at app.js todos
+    data = request.get_json()
+    nodesAlive = data["stopParams"]["selectedNodes"]
     executionRoutines.shutdownAgentsGracefully(nodesAlive)
+    return "Success", 200
+
+
+@app.route("/api/cmdParams", methods=["POST"])
+def createCommandParam():
+    """
+    @brief: create a new command param
+    """
+
+    pass
+
+
+@app.route("/api/cmdParams", methods=["GET"])
+def getCommandParams():
+    """
+    @brief: get a list of command params
+    @return: json containing list of cmd params as a value for cmdParamsList key
+    """
+    print("get")
+    return
+
+
+@app.route("/api/cmdParams/<int:item_id>", methods=["PUT"])
+def updateCommandParams(item_id):
+    """
+    @brief: update one of the command param with the given item_id
+    @param: id of the item to be updated
+    @return: update status
+    """
+    print(item_id)
+
+
+# TODO: finish the api and db ops for now only dummy REST endpoints in place
+
+
+@app.route("/api/cmdParams/<int:item_id>", methods=["DELETE"])
+def deleteCommandParam(item_id):
+    """
+    @breif: delete one of the command params with the given item_id
+    @param: id of the item to be deleted
+    @return: delete status
+    """
+    print(item_id)
 
 
 # TODO: define cent decent choice in fe,currently hardcoded do docsstrings for masternode

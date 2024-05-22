@@ -29,11 +29,14 @@
   user-select: none;
   outline: none;
   transition: background-color 250ms, border-color 250ms, color 250ms;
+  align-items: center;
+  justify-content: center;
   
 }
 
 .Button-text{
   font-size: large;
+  
 }
 
 .selectionOutline{
@@ -63,7 +66,7 @@
   display: block;
 }
 
-.availableScripts {
+.wideOutline {
   width: 95%;
   height: 100%;
   background-color: white;
@@ -76,10 +79,9 @@
 
 
 .center-div {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 50px;
+  display:block;
+
+  
 }
 
 .center-div button {
@@ -116,6 +118,38 @@
   transition: .4s;
   border-radius: 34px;
 }
+
+.buttonContainer{
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+ }
+
+
+ .buttonContainer button{
+    display: flex;
+    color: #282c34;
+    background-color: white;
+    border: 1px solid #dcdcdc;
+    border-radius: 10px;
+    padding: 6px 16px;
+    font-size: small;
+    font-weight: 500;
+    line-height: 1.43;
+    text-transform: uppercase;
+    cursor: pointer;
+    user-select: none;
+    outline: none;
+    transition: background-color 250ms, border-color 250ms, color 250ms;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    min-width: 250px;
+    align-items: center;
+    justify-content: center;
+
+
+ }
 
 .slider:before {
   position: absolute;

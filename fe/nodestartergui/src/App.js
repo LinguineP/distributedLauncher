@@ -1,6 +1,7 @@
 import './App.css';
 import { React, useState } from 'react';
 import RunnableNodeList from './runnablenodeList/RunnableNodeListComponent';
+import CommandParamsList from './paramsList/CommandParamsList.jsx';
 import CommunicationHandler from './communicationHandlers/communicationHandler.ts'
 
 
@@ -16,7 +17,6 @@ function App() {
   const [availableNodes,setAvailableNodes]=useState([]);
   const [selectedNodes,setSelectedNodes]=useState([]);
 
- 
 
   const [availableScripts,setAvailableScripts]=useState([])
   
@@ -39,20 +39,15 @@ function App() {
   };
   
   const startRemote=async()=>{
-    let numberOfNodes;
-    //if (inputValue.trim() !== '') {
-      //numberOfNodes=parseInt(inputValue)
-      setNumber(parseInt(numberOfNodes));
-    //}
-
+ 
 
   
 
     const requestParams={
                           selectedScript:lastClickedItem,
-                          selectedNumberOfNodes:numberOfNodes,
+                          selectedParams:' ', //TODO
                           selectedNodes:selectedNodes ,
-                          decentSelected:isToggled
+                          
                         }
     requestHandler.startNodes(requestParams);
                 
@@ -107,104 +102,74 @@ function App() {
   };
   
 
-  const [isToggled, setIsToggled] = useState(false);
 
-  const handleToggle = () => {
-    setIsToggled(!isToggled);
-  };
+  
 
-  const [number, setNumber] = useState(null);
-  const [inputValue, setInputValue] = useState(0);
-
-  const handleChange = (event) => {
-    const value = parseInt(event.target.value, 10);
-    const minValue = selectedNodes.length;
-    if (value >= minValue) {
-      setInputValue(value);
-    } else {
-      setInputValue(minValue);
-    }
-  };
+ 
 
   /* TODO: add a shutdown nodes button, number of nodes >= selected Nodes , cent/decent choice, maybe check nodes health toast  */
 
   return (
     <div className="App">
-      <header className="App-header">
-       <p className='buttonText'>Welcome to distributed app starter</p>
-       <button onClick={discovery} className="Action-button"><p className='Button-text'>{discoveryOn ? stopDiscoveryText : startDiscoveryText}</p></button>
-       
-       <div className="selectionOutline">
-        <div className="halfDiv">
-          <p>Available Nodes</p>
-          <hr></hr>
-          <RunnableNodeList items={availableNodes}  script={false} onItemClick={itemWasClickedAvailable}>
-          </RunnableNodeList>
-        </div>
-        <div className="halfDiv">
-          <p>Selected Nodes</p>
-          <hr></hr>
-          <RunnableNodeList items={selectedNodes} script={false} onItemClick={itemWasClickedSelected}>
-          </RunnableNodeList>
-        </div>
-       </div>
-       <div className="availableScripts">
-        
-          <p>Available Scripts</p>
-          <hr></hr>
-          <RunnableNodeList items={availableScripts} script={true} onItemClick={itemWasClickedScript} lastClickedItem={lastClickedItem} 
-  setLastClickedItem={setLastClickedItem}>
+    <header className="App-header">
 
-          </RunnableNodeList>      
-       </div>
-          <div className="selectionOutline">
-            <div className="altHalfDiv">
-              {
+        <p className='buttonText'>Welcome to distributed app starter</p>
 
-                <div className="selectionOutline">
-                  <div className="altHalfDiv">
-                    <div className='center-div'>
-                      <label>
-                          Enter number of nodes:
-                       <input
-                          type="number"
-                          value={inputValue}
-                          onChange={handleChange} />
-                      </label>
-                  </div>
-                </div>
-                <div className="altHalfDiv">
-                  <div className='center-div'>
-                      <div className="toggle-switch">
-                      <p>{isToggled ? 'Decentralised' : 'Centralised'}</p>
-                        <label className="switch">
-                          <input type="checkbox" checked={isToggled} onChange={handleToggle} />
-                          <span className="slider"></span>
-                        </label>
-                      </div>
-                  </div>
-                </div></div>
-              }
-               
+        <button onClick={discovery} className="Action-button">
+          <p className='Button-text'>{discoveryOn ? stopDiscoveryText : startDiscoveryText}</p>
+        </button>
+
+        <div className="selectionOutline">
+            <div className="halfDiv">
+              <p>Available Nodes</p>
+              <hr></hr>
+              <RunnableNodeList items={availableNodes}  script={false} onItemClick={itemWasClickedAvailable}>
+              </RunnableNodeList>
             </div>
-            <div className="altHalfDiv">
+            <div className="halfDiv">
+              <p>Selected Nodes</p>
+              <hr></hr>
+              <RunnableNodeList items={selectedNodes} script={false} onItemClick={itemWasClickedSelected}>
+              </RunnableNodeList>
+            </div>
+        </div>
+
+        <div className="wideOutline">
+          
+            <p>Available Scripts</p>
+            <hr></hr>
+            <RunnableNodeList items={availableScripts} script={true} onItemClick={itemWasClickedScript} lastClickedItem={lastClickedItem} 
+                          setLastClickedItem={setLastClickedItem}>
+            </RunnableNodeList>      
+        </div>
+        <div className="wideOutline">
               <div className="selectionOutline">
-                  <div className="altHalfDiv">
-                    <div className="center-div">
-                      <button onClick={startRemote} className="Action-button"><p className='Button-text'>Start Scripts</p></button>
+              
+                  
+                  <CommandParamsList></CommandParamsList>
+              
+                
+              </div>
+          </div>
+
+
+          <div className="selectionOutline">
+              <div className="altHalfDiv">
+                    <div className='buttonContainer'>  
+                        <button onClick={startRemote} ><p className='Button-text'>Start Scripts</p></button>
                     </div>
-                  </div>
-                  <div className="altHalfDiv">
-                    <div className="center-div">
-                      <button onClick={stopRemote} className="Action-button"><p className='Button-text'>Shutdown Nodes</p></button>
-                    </div>
+                    
+              </div>
+              <div className="altHalfDiv">
+                  <div className='buttonContainer'>
+                        <button onClick={stopRemote} ><p className='Button-text'>Shutdown Nodes</p></button>
                   </div>
               </div>
-            </div>
-        </div>
-      </header>
+          </div>
+        </header>
     </div>
   );
 }
+
 
 export default App;

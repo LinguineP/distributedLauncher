@@ -14,12 +14,13 @@ def run_script(script_cmd: str):
     handler.send_command(script_cmd)
 
     # press any key to continue
-    handler.send_input(" ")
 
     # read output
-    output = handler.read_output(timeout=1)
+    output = handler.read_output(timeout=5)
     for line in output:
         print(line)
+
+    handler.send_input(" ")
 
 
 def decent_cmd_builder(script, numberOfNodes, currentNodeId, masterNodeIp) -> str:
@@ -28,7 +29,7 @@ def decent_cmd_builder(script, numberOfNodes, currentNodeId, masterNodeIp) -> st
     runDecentCmd = (
         f"{utils.get_python_cmd()}"
         f" "
-        f"{utils.find_script( utils.escape_chars(agentConfig.cfg['baseProjectPath']),script)}"
+        f"{utils.find_file( utils.escape_chars(agentConfig.cfg['baseProjectPath']),script)}"
         f" "
         f"{numberOfNodes}"
         f" "
@@ -48,7 +49,7 @@ def cent_cmd_builder(
     runCentCmd = (
         f"{utils.get_python_cmd()}"
         f" "
-        f"{utils.find_script( utils.escape_chars(agentConfig.cfg['baseProjectPath']),script)}"
+        f"{utils.find_file( utils.escape_chars(agentConfig.cfg['baseProjectPath']),script)}"
         f" "
         f"{numberOfNodes}"
         f" "
@@ -114,6 +115,7 @@ def wait_for_instructions():
             received["masterNodeIp"],
             received["decent"],
         )
+        received = None
     elif received["message"] == "shutdown_agent":
         exit_gracefully()
         return False

@@ -1,53 +1,41 @@
+import time
 import messagingHandler as msg
 
 
-portComm = 5002
+portComm = 55002
 
 
 def startScripts(params_dict):
-    # TODO implement starting of scripts
-    # example params_dict{'selectedScript': None, 'selectedNumberOfNodes': 2, 'selectedNodes': [{'hostname': 'pv_t480s', 'ip': '192.168.0.24'}]}
-    selectedScript = params_dict["selectedScript"]
-    selectedNumberOfNodes = params_dict["selectedNumberOfNodes"]
-    selectedNodes = params_dict["selectedNodes"]
+    # Extract parameters from the dictionary
+    selectedScript = params_dict.get("selectedScript")
+    selectedNumberOfNodes = params_dict.get("selectedNumberOfNodes")
+    selectedNodes = params_dict.get("selectedNodes")
+    decentFlag = params_dict.get("decentSelected")
 
-    if selectedScript is None:
+    # Check if a script is selected
+    if not selectedScript:
         return "No script selected"
 
-    nodeNo = 0
+    # Initialize variables
     masterNode = []
-    if msg.masterIp:
-        masterNode = list(
-            filter(lambda node: node["ip"] == msg.masterIp, selectedNodes)
-        )
-        selectedNodes = list(
-            filter(lambda node: node["ip"] != msg.masterIp, selectedNodes)
-        )
-        msg.send_start(
-            dest_ip=masterNode[0]["ip"],
-            script=selectedScript,
-            numberOfNodes=selectedNumberOfNodes,
-            nodeId=0,
-            masterNodeId=0,
-            masterNodeIp=masterNode[0]["ip"],
-            decent=False,
-        )
-        nodeNo = 1
+    nodeNo = 0
 
+    # Iterate through remaining nodes
     for node in selectedNodes:
-        if nodeNo == 0:
-            masterNode.append(node)
-            print(f"master node will be {node['hostname']} at ip {node['ip']}")
+        time.sleep(0.5)
+
         msg.send_start(
             dest_ip=node["ip"],
             script=selectedScript,
             numberOfNodes=selectedNumberOfNodes,
-            nodeId=0,
+            nodeId=nodeNo,
             masterNodeId=0,
-            masterNodeIp=masterNode[0]["ip"],
-            decent=False,
+            masterNodeIp=selectedNodes[0]["ip"],
+            decent=decentFlag,
         )
         nodeNo += 1
+
+    return "Scripts started successfully"
 
 
 def shutdownAgentsGracefully(nodesAlive):
