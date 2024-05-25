@@ -1,6 +1,8 @@
 import axios from "axios";
 
 class CommunicationHandler {
+  private paramsUrl: string = "/api/cmdParams";
+
   stopScan() {
     return axios
       .get("/api/stopScan")
@@ -54,9 +56,9 @@ class CommunicationHandler {
       });
   }
 
-  async postData(url, data) {
+  async postCmdParam(data: any) {
     try {
-      const response = await axios.post(url, data);
+      const response = await axios.post(this.paramsUrl, data);
       console.log("POST Response:", response.data);
       return response.data;
     } catch (error) {
@@ -65,10 +67,9 @@ class CommunicationHandler {
     }
   }
 
-  // GET Method
-  async getData(url) {
+  async getCmdParams() {
     try {
-      const response = await axios.get(url);
+      const response = await axios.get(this.paramsUrl);
       console.log("GET Response:", response.data);
       return response.data;
     } catch (error) {
@@ -77,10 +78,9 @@ class CommunicationHandler {
     }
   }
 
-  // DELETE Method
-  async deleteData(url) {
+  async deleteCmdParam(id: number) {
     try {
-      const response = await axios.delete(url);
+      const response = await axios.delete(`${this.paramsUrl}/${id}`);
       console.log("DELETE Response:", response.data);
       return response.data;
     } catch (error) {
@@ -89,10 +89,9 @@ class CommunicationHandler {
     }
   }
 
-  // PUT Method
-  async putData(url, data) {
+  async putCmdParam(id: number, data: any) {
     try {
-      const response = await axios.put(url, data);
+      const response = await axios.put(`${this.paramsUrl}/${id}`, data);
       console.log("PUT Response:", response.data);
       return response.data;
     } catch (error) {

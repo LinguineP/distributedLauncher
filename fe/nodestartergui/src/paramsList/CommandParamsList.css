@@ -88,3 +88,7 @@
 .cancel-button:hover {
     background-color: #e95d1d;
 }
+
+.list-item.last-clicked {
+    border: 2px solid red;
+}

@@ -24,7 +24,6 @@ def stopScan():
         response = {
             "message": "Worker stopped.",
             "availableNodes": nodesAlive,
-            "availableScripts": availableScripts,
         }
 
         return jsonify(response)
@@ -68,18 +67,42 @@ def createCommandParam():
     """
     @brief: create a new command param
     """
+    try:
+        params_list = []
+        # Parse the incoming JSON request body
+        new_param = request.get_json()
+        if not new_param or "value" not in new_param:
+            return jsonify({"error": "Invalid input"}), 400
 
-    pass
+        # Create a new id for the new parameter
+        new_id = max(param["id"] for param in params_list) + 1 if params_list else 1
+        new_param["id"] = new_id
+
+        # Add the new parameter to the data store
+        params_list.append(new_param)
+
+        # Return the created parameter and a 201 status code
+        return jsonify(new_param), 201
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/api/cmdParams", methods=["GET"])
-def getCommandParams():
+def readCommandParams():
     """
     @brief: get a list of command params
     @return: json containing list of cmd params as a value for cmdParamsList key
     """
-    print("get")
-    return
+
+    params_list = [
+        {"id": 1, "value": "Item 1"},
+        {"id": 2, "value": "Item 2"},
+        {"id": 3, "value": "Item 3"},
+    ]
+    availableScripts: list = dataProcessing.getAvailableScripts()
+
+    return jsonify({"paramsList": params_list, "availableScripts": availableScripts})
 
 
 @app.route("/api/cmdParams/<int:item_id>", methods=["PUT"])
@@ -89,20 +112,51 @@ def updateCommandParams(item_id):
     @param: id of the item to be updated
     @return: update status
     """
-    print(item_id)
+    try:
+        # Parse the incoming JSON request body
+        updated_param = request.get_json()
+        if not updated_param or "value" not in updated_param:
+            return jsonify({"error": "Invalid input"}), 400
+        params_list = [
+            {"id": 1, "value": "Item 1"},
+            {"id": 2, "value": "Item 2"},
+            {"id": 3, "value": "Item 3"},
+        ]
+        # Find the item by ID and update it
+        for param in params_list:
+            if param["id"] == item_id:
+                param["value"] = updated_param["value"]
+                return jsonify(param), 200
 
+        return jsonify({"error": "Item not found"}), 404
 
-# TODO: finish the api and db ops for now only dummy REST endpoints in place
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/api/cmdParams/<int:item_id>", methods=["DELETE"])
 def deleteCommandParam(item_id):
     """
-    @breif: delete one of the command params with the given item_id
+    @brief: delete one of the command params with the given item_id
     @param: id of the item to be deleted
     @return: delete status
     """
-    print(item_id)
+    params_list = [
+        {"id": 1, "value": "Item 1"},
+        {"id": 2, "value": "Item 2"},
+        {"id": 3, "value": "Item 3"},
+    ]
+    try:
+        # Find the item by ID and delete it
+        for param in params_list:
+            if param["id"] == item_id:
+                params_list.remove(param)
+                return jsonify({"message": "Item deleted"}), 200
+
+        return jsonify({"error": "Item not found"}), 404
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 # TODO: define cent decent choice in fe,currently hardcoded do docsstrings for masternode
