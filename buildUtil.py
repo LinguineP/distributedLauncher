@@ -71,9 +71,11 @@ def npm_build(directory_path):
 
 
 if __name__ == "__main__":
-    build_path = "D:/fax/diplomski/distributedLauncher/fe/nodestartergui/build"
-    static_path = "D:/fax/diplomski/distributedLauncher/master/static"
-    base_npm_path = "D:/fax/diplomski/distributedLauncher/fe/nodestartergui"
-    npm_build(base_npm_path)
-    clean_contents(static_path)
-    copy_directory_contents(build_path, static_path)
+    while True:
+        input("press enter to build ...")
+        build_path = "D:/fax/diplomski/distributedLauncher/fe/nodestartergui/build"
+        static_path = "D:/fax/diplomski/distributedLauncher/master/static"
+        base_npm_path = "D:/fax/diplomski/distributedLauncher/fe/nodestartergui"
+        npm_build(base_npm_path)
+        clean_contents(static_path)
+        copy_directory_contents(build_path, static_path)

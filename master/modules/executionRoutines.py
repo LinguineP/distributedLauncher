@@ -38,6 +38,10 @@ def startScripts(params_dict):
     return "Scripts started successfully"
 
 
+def startScriptsPreset(params):
+    pass
+
+
 def shutdownAgentsGracefully(nodesAlive):
     # TODO implement shuttingdown of agents
     shutdown_msg = {"message": "shutdown_agent"}

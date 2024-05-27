@@ -1,5 +1,6 @@
 import os
 from config import *
+import utils
 
 
 def encription():
@@ -35,7 +36,7 @@ def getAvailableScripts():
         []
     )  # it is assumed that the the script names are consistent across nodes, there are no duplicate scripts and proper paths  to scripts are given in cfg
     for path in cfg["scriptPaths"]:
-        scripts.extend(get_files(path))
+        scripts.extend(get_files(utils.escape_chars(path)))
 
     return scripts
 

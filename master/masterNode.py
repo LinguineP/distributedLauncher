@@ -3,11 +3,12 @@ from flask import Flask, render_template, jsonify, request
 from modules import asyncBeaconRoutines as asyncBeacon
 from modules import dataProcessing
 from modules import executionRoutines
-
+from modules import dbAdapter
 import multiprocessing as mp
-import socket
+
 
 app = Flask(__name__, static_folder="static/static", template_folder="static")
+db_adapter = dbAdapter.SQLiteDBAdapter()
 
 
 masterIp = ""
@@ -48,7 +49,8 @@ def startNodes():
     # TODO: issue start command
     data = request.get_json()
     # example data {'startParams': {'selectedScript': None, 'selectedNumberOfNodes': 2, 'selectedNodes': [{'hostname': 'pv_t480s', 'ip': '192.168.0.24'}]}} incoming data example
-    executionRoutines.startScripts(data["startParams"])
+    # executionRoutines.startScripts(data["startParams"])
+    executionRoutines.startScriptsPresetParams(data["startParams"])
 
     return "Success", 200
 
@@ -68,20 +70,13 @@ def createCommandParam():
     @brief: create a new command param
     """
     try:
-        params_list = []
-        # Parse the incoming JSON request body
+
         new_param = request.get_json()
         if not new_param or "value" not in new_param:
             return jsonify({"error": "Invalid input"}), 400
+        print(new_param)
+        db_adapter.insert_params_setting(new_param["value"])
 
-        # Create a new id for the new parameter
-        new_id = max(param["id"] for param in params_list) + 1 if params_list else 1
-        new_param["id"] = new_id
-
-        # Add the new parameter to the data store
-        params_list.append(new_param)
-
-        # Return the created parameter and a 201 status code
         return jsonify(new_param), 201
 
     except Exception as e:
@@ -95,11 +90,7 @@ def readCommandParams():
     @return: json containing list of cmd params as a value for cmdParamsList key
     """
 
-    params_list = [
-        {"id": 1, "value": "Item 1"},
-        {"id": 2, "value": "Item 2"},
-        {"id": 3, "value": "Item 3"},
-    ]
+    params_list = db_adapter.get_all_params_settings()
     availableScripts: list = dataProcessing.getAvailableScripts()
 
     return jsonify({"paramsList": params_list, "availableScripts": availableScripts})
@@ -117,16 +108,10 @@ def updateCommandParams(item_id):
         updated_param = request.get_json()
         if not updated_param or "value" not in updated_param:
             return jsonify({"error": "Invalid input"}), 400
-        params_list = [
-            {"id": 1, "value": "Item 1"},
-            {"id": 2, "value": "Item 2"},
-            {"id": 3, "value": "Item 3"},
-        ]
+
         # Find the item by ID and update it
-        for param in params_list:
-            if param["id"] == item_id:
-                param["value"] = updated_param["value"]
-                return jsonify(param), 200
+        if db_adapter.update_params_setting(item_id, updated_param["value"]):
+            return jsonify(updated_param), 200
 
         return jsonify({"error": "Item not found"}), 404
 
@@ -141,18 +126,11 @@ def deleteCommandParam(item_id):
     @param: id of the item to be deleted
     @return: delete status
     """
-    params_list = [
-        {"id": 1, "value": "Item 1"},
-        {"id": 2, "value": "Item 2"},
-        {"id": 3, "value": "Item 3"},
-    ]
-    try:
-        # Find the item by ID and delete it
-        for param in params_list:
-            if param["id"] == item_id:
-                params_list.remove(param)
-                return jsonify({"message": "Item deleted"}), 200
 
+    try:
+
+        if db_adapter.delete_params_setting(item_id):
+            return jsonify({"message": "Item deleted"}), 200
         return jsonify({"error": "Item not found"}), 404
 
     except Exception as e:
@@ -169,5 +147,6 @@ def index():
 if __name__ == "__main__":
 
     print("Starting masterNode")
+
     app.debug = True
     app.run(host="0.0.0.0", port=8080)
