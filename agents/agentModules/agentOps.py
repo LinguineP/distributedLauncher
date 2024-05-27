@@ -4,22 +4,15 @@ import agentMessaging as msg
 from shellInteract import *
 
 
-_shell_active = False
-
-
 def run_script(script_cmd: str):
     """runs the script specified in the cmd parameter"""
+    print()
+    print("\n------------------------------------------------------------\n")
     handler = ShellHandler()
-    # launch script
-    handler.send_command(script_cmd)
 
-    # press any key to continue
-    handler.send_input(" ")
+    handler.run_command(script_cmd)
 
-    # read output
-    output = handler.read_output(timeout=1)
-    for line in output:
-        print(line)
+    print("\n------------------------------------------------------------\n\n")
 
 
 def decent_cmd_builder(script, numberOfNodes, currentNodeId, masterNodeIp) -> str:
@@ -28,7 +21,7 @@ def decent_cmd_builder(script, numberOfNodes, currentNodeId, masterNodeIp) -> st
     runDecentCmd = (
         f"{utils.get_python_cmd()}"
         f" "
-        f"{utils.find_script( utils.escape_chars(agentConfig.cfg['baseProjectPath']),script)}"
+        f"{utils.find_file( utils.escape_chars(agentConfig.cfg['baseProjectPath']),script)}"
         f" "
         f"{numberOfNodes}"
         f" "
@@ -48,7 +41,7 @@ def cent_cmd_builder(
     runCentCmd = (
         f"{utils.get_python_cmd()}"
         f" "
-        f"{utils.find_script( utils.escape_chars(agentConfig.cfg['baseProjectPath']),script)}"
+        f"{utils.find_file( utils.escape_chars(agentConfig.cfg['baseProjectPath']),script)}"
         f" "
         f"{numberOfNodes}"
         f" "
@@ -74,6 +67,7 @@ def start_node(
         cmd = cent_cmd_builder(
             script, numberOfNodes, currentNodeId, masterNodeId, masterNodeIp
         )
+
     run_script(cmd)
 
 
@@ -85,11 +79,7 @@ def connect() -> str:
 
 def exit_gracefully():
     """cleans up before a gracefull exit"""
-    global _shell_active
-    if _shell_active:
-        handler = ShellHandler()
-        handler.close_shell()
-        _shell_active = False
+
     print("Shutting down the agent...")
 
 
@@ -103,9 +93,6 @@ def wait_for_instructions():
 
     received = msg.receive_command()
     if received["message"] == "start_node":
-        if not _shell_active:
-            ShellHandler()
-            _shell_active = True
         start_node(
             received["script"],
             received["numberOfNodes"],

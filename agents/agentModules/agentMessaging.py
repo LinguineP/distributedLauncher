@@ -4,11 +4,10 @@ from agentConfig import *
 import socket
 import multicastSetup
 
-multicastGroup = '239.255.0.0'
-portMulticast = 55001 #not a known port number
-portComm=55002
-masterIp=''
-
+multicastGroup = "239.255.0.0"
+portMulticast = 55001  # not a known port number
+portComm = 55002
+masterIp = ""
 
 
 multicastGroup = "239.255.10.1"  # viewRFC2365
@@ -120,4 +119,4 @@ def send_hello():
         "ip": agentIp,
         "hostname": socket.gethostname(),
     }
-    send_json(masterIp, commPort, hello_msg)
+    send_json(masterIp, multicastPort, hello_msg)
