@@ -87,6 +87,12 @@ def send_start(
     send_json(dest_ip, portComm, message)
 
 
+def send_start_set_params(dest_ip, script, params):
+    message = {"message": "start_node_params", "script": script, "params": params}
+    print(message)
+    send_json(dest_ip, portComm, message)
+
+
 def send_json(dest_ip, dest_port, data_dict):
     # Convert the dictionary to JSON
     json_data = json.dumps(data_dict)

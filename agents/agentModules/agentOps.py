@@ -71,6 +71,13 @@ def start_node(
     run_script(cmd)
 
 
+def start_node_params(script, params):
+    print("node started")
+    cmd = f"{utils.get_python_cmd()} {utils.find_file(utils.escape_chars(agentConfig.cfg['baseProjectPath']),script)} {params}"
+    print(cmd)
+    run_script(cmd)
+
+
 def connect() -> str:
     masterIp = msg.receive_ip_from_multicast()
     msg.send_hello()
@@ -101,6 +108,9 @@ def wait_for_instructions():
             received["masterNodeIp"],
             received["decent"],
         )
+        received = None
+    elif received["message"] == "start_node_params":
+        start_node_params(received["script"], received["params"])
         received = None
     elif received["message"] == "shutdown_agent":
         exit_gracefully()

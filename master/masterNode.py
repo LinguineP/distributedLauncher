@@ -50,7 +50,7 @@ def startNodes():
     data = request.get_json()
     # example data {'startParams': {'selectedScript': None, 'selectedNumberOfNodes': 2, 'selectedNodes': [{'hostname': 'pv_t480s', 'ip': '192.168.0.24'}]}} incoming data example
     # executionRoutines.startScripts(data["startParams"])
-    executionRoutines.startScriptsPresetParams(data["startParams"])
+    executionRoutines.startScriptsPreset(data["startParams"])
 
     return "Success", 200
 
