@@ -101,6 +101,7 @@ def wait_for_instructions():
             received["masterNodeIp"],
             received["decent"],
         )
+        received = None
     elif received["message"] == "shutdown_agent":
         exit_gracefully()
         return False

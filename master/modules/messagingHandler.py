@@ -83,6 +83,7 @@ def send_start(
         "masterNodeIp": masterNodeIp,
         "decent": decent,
     }
+    print(message)
     send_json(dest_ip, portComm, message)
 
 

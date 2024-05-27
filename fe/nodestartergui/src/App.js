@@ -1,206 +1,135 @@
 import './App.css';
-import { React, useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import RunnableNodeList from './runnablenodeList/RunnableNodeListComponent';
-import CommunicationHandler from './communicationHandlers/communicationHandler.ts'
-
+import CommandParamsList from './paramsList/CommandParamsList.jsx';
+import CommunicationHandler from './communicationHandlers/communicationHandler.ts';
 
 function App() {
-  
-  const requestHandler=new CommunicationHandler();
+  const requestHandler = useMemo(() => {
+    return new CommunicationHandler();
+  }, []);
 
   const [discoveryOn, setDiscoveryOn] = useState(false);
-  const startDiscoveryText="Start discovery";
-  const stopDiscoveryText="Stop discovery";
-  
+  const startDiscoveryText = "Start discovery";
+  const stopDiscoveryText = "Stop discovery";
 
-  const [availableNodes,setAvailableNodes]=useState([]);
-  const [selectedNodes,setSelectedNodes]=useState([]);
+  const [paramsList, setParamsList] = useState([]);
 
- 
-
-  const [availableScripts,setAvailableScripts]=useState([])
-  
-
-  const discovery=async()=>{
-    setDiscoveryOn(!discoveryOn)
-    if(!discoveryOn){
-      console.log(false)
-      requestHandler.startScan();
-      return
+  useEffect(() => {
+    const getParamsList = async () => {
+      try {
+        const data = await requestHandler.getCmdParams();
+        console.log(data.paramsList)
+        setParamsList(data.paramsList);
+        setAvailableScripts(data.availableScripts);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
     }
-    const response=await requestHandler.stopScan();
-    console.log(response)
 
+    getParamsList();
+  }, [requestHandler]);
 
+  const [availableNodes, setAvailableNodes] = useState([]);
+  const [selectedNodes, setSelectedNodes] = useState([]);
+  const [availableScripts, setAvailableScripts] = useState([]);
+  const [lastClickedScriptText, setLastClickedScriptText] = useState("");
+  const [lastClickedParamsText, setLastClickedParamsText] = useState(""); 
+
+  const discovery = async () => {
+    setDiscoveryOn(!discoveryOn);
+    if (!discoveryOn) {
+      requestHandler.startScan();
+      return;
+    }
+    const response = await requestHandler.stopScan();
     setAvailableNodes(response.availableNodes);
-    setAvailableScripts(response.availableScripts);
-  
-    console.log(true)
   };
-  
-  const startRemote=async()=>{
-    let numberOfNodes;
-    //if (inputValue.trim() !== '') {
-      //numberOfNodes=parseInt(inputValue)
-      setNumber(parseInt(numberOfNodes));
-    //}
-
 
   
 
-    const requestParams={
-                          selectedScript:lastClickedItem,
-                          selectedNumberOfNodes:numberOfNodes,
-                          selectedNodes:selectedNodes ,
-                          decentSelected:isToggled
-                        }
+  const startRemote = async () => {
+    console.log(lastClickedScriptText);
+    const requestParams = {
+      selectedScript: lastClickedScriptText, // Use the text content of the last clicked script
+      selectedParams: lastClickedParamsText, // Use the text content of the last clicked params
+      selectedNodes: selectedNodes,
+    }
     requestHandler.startNodes(requestParams);
-                
   };
 
-
-  const stopRemote=async()=>{
-
-    const requestParams={
-                          selectedNodes:selectedNodes 
-                        }
+  const stopRemote = async () => {
+    const requestParams = {
+      selectedNodes: selectedNodes
+    }
     requestHandler.stopNodes(requestParams);
-                
   };
 
-
-    const itemWasClickedAvailable = (item) => {
-    console.log(`Item with hostName ${item.hostName} and IP ${item.ip} was clicked`);
-    
+  const itemWasClickedAvailable = (item) => {
     const updatedAvailableNodes = availableNodes.filter((listItem) => listItem !== item);
     setAvailableNodes(updatedAvailableNodes);
-
     setSelectedNodes([...selectedNodes, item]);
-    
-
-    console.log(availableNodes);
   };
-
-
 
   const itemWasClickedSelected = (item) => {
-    console.log(`Item with hostName ${item.hostName} and IP ${item.ip} was clicked`);
     const updatedSelectedNodes = selectedNodes.filter((listItem) => listItem !== item);
-    setAvailableNodes([...availableNodes, item]); // Change this line
-    
-    // Add the item to the destination list
+    setAvailableNodes([...availableNodes, item]);
     setSelectedNodes(updatedSelectedNodes);
-
-    console.log(selectedNodes);
   };
-  
 
+  const [lastClickedScript, setLastClickedScript] = useState(null);
 
-  
-
-  const [lastClickedItem, setLastClickedItem] = useState(null);
-
-
-  
   const itemWasClickedScript = (item) => {
-    setLastClickedItem(item)
+    setLastClickedScript(item);
+    setLastClickedScriptText(item); // Set the text content of the last clicked item
   };
-  
-
-  const [isToggled, setIsToggled] = useState(false);
-
-  const handleToggle = () => {
-    setIsToggled(!isToggled);
-  };
-
-  const [number, setNumber] = useState(null);
-  const [inputValue, setInputValue] = useState(0);
-
-  const handleChange = (event) => {
-    const value = parseInt(event.target.value, 10);
-    const minValue = selectedNodes.length;
-    if (value >= minValue) {
-      setInputValue(value);
-    } else {
-      setInputValue(minValue);
-    }
-  };
-
-  /* TODO: add a shutdown nodes button, number of nodes >= selected Nodes , cent/decent choice, maybe check nodes health toast  */
 
   return (
     <div className="App">
       <header className="App-header">
-       <p className='buttonText'>Welcome to distributed app starter</p>
-       <button onClick={discovery} className="Action-button"><p className='Button-text'>{discoveryOn ? stopDiscoveryText : startDiscoveryText}</p></button>
-       
-       <div className="selectionOutline">
-        <div className="halfDiv">
-          <p>Available Nodes</p>
-          <hr></hr>
-          <RunnableNodeList items={availableNodes}  script={false} onItemClick={itemWasClickedAvailable}>
-          </RunnableNodeList>
+        <p className='buttonText'>Welcome to distributed app starter</p>
+
+        <button onClick={discovery} className="Action-button">
+          <p className='Button-text'>{discoveryOn ? stopDiscoveryText : startDiscoveryText}</p>
+        </button>
+
+        <div className="selectionOutline">
+          <div className="halfDiv">
+            <p>Available Nodes</p>
+            <hr></hr>
+            <RunnableNodeList items={availableNodes} script={false} onItemClick={itemWasClickedAvailable} />
+          </div>
+          <div className="halfDiv">
+            <p>Selected Nodes</p>
+            <hr></hr>
+            <RunnableNodeList items={selectedNodes} script={false} onItemClick={itemWasClickedSelected} />
+          </div>
         </div>
-        <div className="halfDiv">
-          <p>Selected Nodes</p>
-          <hr></hr>
-          <RunnableNodeList items={selectedNodes} script={false} onItemClick={itemWasClickedSelected}>
-          </RunnableNodeList>
-        </div>
-       </div>
-       <div className="availableScripts">
-        
+
+        <div className="wideOutline">
           <p>Available Scripts</p>
           <hr></hr>
-          <RunnableNodeList items={availableScripts} script={true} onItemClick={itemWasClickedScript} lastClickedItem={lastClickedItem} 
-  setLastClickedItem={setLastClickedItem}>
+          <RunnableNodeList items={availableScripts} script={true} onItemClick={itemWasClickedScript} lastClickedScript={lastClickedScript} setLastClickedScript={setLastClickedScript} />
+        </div>
 
-          </RunnableNodeList>      
-       </div>
+        <div className="wideOutline">
           <div className="selectionOutline">
-            <div className="altHalfDiv">
-              {
+            <CommandParamsList paramsList={paramsList}
+            itemClicked={(value)=>{setLastClickedParamsText(value) }} />
+          </div>
+        </div>
 
-                <div className="selectionOutline">
-                  <div className="altHalfDiv">
-                    <div className='center-div'>
-                      <label>
-                          Enter number of nodes:
-                       <input
-                          type="number"
-                          value={inputValue}
-                          onChange={handleChange} />
-                      </label>
-                  </div>
-                </div>
-                <div className="altHalfDiv">
-                  <div className='center-div'>
-                      <div className="toggle-switch">
-                      <p>{isToggled ? 'Decentralised' : 'Centralised'}</p>
-                        <label className="switch">
-                          <input type="checkbox" checked={isToggled} onChange={handleToggle} />
-                          <span className="slider"></span>
-                        </label>
-                      </div>
-                  </div>
-                </div></div>
-              }
-               
+        <div className="selectionOutline">
+          <div className="altHalfDiv">
+            <div className='buttonContainer'>
+              <button onClick={startRemote}><p className='Button-text'>Start Scripts</p></button>
             </div>
-            <div className="altHalfDiv">
-              <div className="selectionOutline">
-                  <div className="altHalfDiv">
-                    <div className="center-div">
-                      <button onClick={startRemote} className="Action-button"><p className='Button-text'>Start Scripts</p></button>
-                    </div>
-                  </div>
-                  <div className="altHalfDiv">
-                    <div className="center-div">
-                      <button onClick={stopRemote} className="Action-button"><p className='Button-text'>Shutdown Nodes</p></button>
-                    </div>
-                  </div>
-              </div>
+          </div>
+          <div className="altHalfDiv">
+            <div className='buttonContainer'>
+              <button onClick={stopRemote}><p className='Button-text'>Shutdown Nodes</p></button>
             </div>
+          </div>
         </div>
       </header>
     </div>

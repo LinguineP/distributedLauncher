@@ -2,6 +2,7 @@ import socket
 import sys
 import os
 import netifaces
+import ctypes
 from typing import List, Optional, Dict
 from shellInteract import *
 
@@ -71,6 +72,12 @@ def Interface_ip_to_name(interface_ip: str) -> str:
         raise KeyError("Could not find network address with local IP " + interface_ip)
 
     return interface_name
+
+
+if sys.platform == "win32":
+    iphlpapi = ctypes.WinDLL("iphlpapi")
+    win32_GetAdapterIndex = iphlpapi.GetAdapterIndex
+    win32_GetAdapterIndex.argtypes = [ctypes.c_wchar_p, ctypes.POINTER(ctypes.c_ulong)]
 
 
 def interface_name_to_index(interface_name: str) -> int:
