@@ -10,8 +10,6 @@ def run_script(script_cmd: str):
     print("\n------------------------------------------------------------\n")
     handler = ShellHandler()
 
-    if sys.platform == "win32":
-        script_cmd += "\r\n"
     handler.run_command(script_cmd)
 
     print("\n------------------------------------------------------------\n\n")
