@@ -30,6 +30,7 @@ class ShellHandler:
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
+                universal_newlines=True,
                 text=True,
             )
             self.shell_setup = True
@@ -55,7 +56,9 @@ class ShellHandler:
 
         # venv activation
         if sys.platform == "win32":
-            self.send_command(f"{self._venv_name}\\Scripts\\activate")  # For Windows
+            self.send_command(
+                f"call {self._venv_name}\\Scripts\\activate"
+            )  # For Windows
         else:
             self.send_command(f"source {self._venv_name}/bin/activate")  # For Linux
         print(f"venv activated: ({self._venv_name})")
@@ -64,15 +67,19 @@ class ShellHandler:
         """simulates command entered"""
         if self.process and self.shell_setup:
             try:
+                print(command)
                 self.process.stdin.write(command + "\n")
                 self.process.stdin.flush()
-                self.process.stdout.flush()
+                # self.process.stdout.flush()
             except Exception as e:
                 print(f"Error sending command: {e}")
 
     def run_command(self, command):
         """runs command on an open shell and closes it while returning the output"""
+        if sys.platform == "win32":
+            command += "\r\n"  # needed for the windows command to pass
         output, error = self.process.communicate(command)
+        print(error)
         print(output)
         self.close_shell()
         return output, error

@@ -10,6 +10,8 @@ def run_script(script_cmd: str):
     print("\n------------------------------------------------------------\n")
     handler = ShellHandler()
 
+    if sys.platform == "win32":
+        script_cmd += "\r\n"
     handler.run_command(script_cmd)
 
     print("\n------------------------------------------------------------\n\n")
@@ -122,3 +124,9 @@ def wait_for_instructions():
         print("Unknown command")
 
     return True
+
+
+if __name__ == "__main__":
+    run_script(
+        "python D:\\fax\\diplomski\\ptbfla2.0\src\examples\mp_async_example2_cent_avg.py 1 0 0 192.168.1.165"
+    )

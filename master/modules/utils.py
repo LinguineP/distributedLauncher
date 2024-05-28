@@ -28,3 +28,9 @@ def extractIpfromString(inString):
 def replace_node_id(inString, node_num):
     result = re.sub(r"\bid\b", str(node_num), inString)
     return result
+
+
+def remove_double_spaces(s):
+    while "  " in s:
+        s = s.replace("  ", " ")
+    return s

@@ -43,21 +43,21 @@ def startScriptsPreset(params):
 
     selectedNodes = params["selectedNodes"]
     selectedScript = params["selectedScript"]
-    selectedParams: str = params["selectedParams"]
-
+    selectedParams: str = utils.remove_double_spaces(params["selectedParams"])
+    print(selectedParams)
     masterIp = utils.extractIpfromString(selectedParams)
 
     paramsAsList = selectedParams.split(" ")
     masterNodeId = -1
-
-    if paramsAsList[1] != "id":
+    isitip = False  # utils.extractIpfromString(paramsAsList[2])
+    print(isitip)
+    if isitip:
         masterNodeId = int(paramsAsList[1])
-        masterParams = utils.replace_node_id(selectedParams, masterNodeId)
-
-    if masterIp:
         selectedNodes = [entry for entry in selectedNodes if entry["ip"] != masterIp[0]]
+        masterParams = utils.replace_node_id(selectedParams, masterNodeId)
         msg.send_start_set_params(masterIp[0], selectedScript, masterParams)
-        time.sleep(0.5)
+        print("master")
+        time.sleep(2.0)
 
     nodeCounter = 0
 
