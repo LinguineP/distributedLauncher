@@ -6,73 +6,44 @@ import utils
 portComm = 55002
 
 
-def startScripts(params_dict):
-    # Extract parameters from the dictionary
-    selectedScript = params_dict.get("selectedScript")
-    selectedNumberOfNodes = params_dict.get("selectedNumberOfNodes")
-    selectedNodes = params_dict.get("selectedNodes")
-    decentFlag = params_dict.get("decentSelected")
-
-    # Check if a script is selected
-    if not selectedScript:
-        return "No script selected"
-
-    # Initialize variables
-    masterNode = []
-    nodeNo = 0
-
-    # Iterate through remaining nodes
-    for node in selectedNodes:
-        time.sleep(0.5)
-
-        msg.send_start(
-            dest_ip=node["ip"],
-            script=selectedScript,
-            numberOfNodes=selectedNumberOfNodes,
-            nodeId=nodeNo,
-            masterNodeId=0,
-            masterNodeIp=selectedNodes[0]["ip"],
-            decent=decentFlag,
-        )
-        nodeNo += 1
-
-    return "Scripts started successfully"
-
-
 def startScriptsPreset(params):
 
     selectedNodes = params["selectedNodes"]
     selectedScript = params["selectedScript"]
-    selectedParams: str = utils.remove_double_spaces(params["selectedParams"])
+    masterIp = params["masterNodeIp"]
+
+    stringTransforms = [
+        (utils.remove_double_space, "  "),
+        (utils.replace_mip, masterIp),
+    ]
+
+    selectedParams = utils.string_transformer(
+        params["selectedParams"], stringTransforms
+    )
+
     print(selectedParams)
-    masterIp = utils.extractIpfromString(selectedParams)
 
     paramsAsList = selectedParams.split(" ")
-    masterNodeId = -1
-    isitip = False  # utils.extractIpfromString(paramsAsList[2])
-    print(isitip)
-    if isitip:
-        masterNodeId = int(paramsAsList[1])
-        selectedNodes = [entry for entry in selectedNodes if entry["ip"] != masterIp[0]]
-        masterParams = utils.replace_node_id(selectedParams, masterNodeId)
-        msg.send_start_set_params(masterIp[0], selectedScript, masterParams)
-        print("master")
-        time.sleep(2.0)
-
-    nodeCounter = 0
-
+    NumberOfNodes = paramsAsList[0]
+    firstNodeId = 0
+    if paramsAsList[2] != "mip":
+        firstNodeId = paramsAsList[2]
+        nodeParams = utils.replace_node_id(selectedParams, firstNodeId)
+        msg.send_start_set_params(masterIp, selectedScript, nodeParams)
+    nodeId = 0
+    # iterates over selected nodes this is ok because it allows for some nodes to be manualy started
     for node in selectedNodes:
-        if nodeCounter == masterNodeId:
-            nodeCounter += 1
-        nodeParams = utils.replace_node_id(selectedParams, nodeCounter)
+        if nodeId == int(firstNodeId):
+            nodeId += 1
+            continue  # skips the node that was already started
+        nodeParams = utils.replace_node_id(selectedParams, nodeId)
         msg.send_start_set_params(node["ip"], selectedScript, nodeParams)
-        nodeCounter += 1
+        nodeId += 1
 
     return "Scripts started successfully"
 
 
 def shutdownAgentsGracefully(nodesAlive):
-    # TODO implement shuttingdown of agents
     shutdown_msg = {"message": "shutdown_agent"}
     for node in nodesAlive:
         msg.send_json(dest_ip=node["ip"], dest_port=portComm, data_dict=shutdown_msg)

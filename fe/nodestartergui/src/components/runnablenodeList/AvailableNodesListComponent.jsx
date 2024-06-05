@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
-const RunnableNodeList = ({ items, onItemClick,script }) => {
+const AvailableNodesList = ({ items, onItemClick, }) => {
+  // eslint-disable-next-line no-unused-vars
   const [lastClickedItem, setLastClickedItem] = useState(null);
 
   const handleItemClick = (item) => {
@@ -11,20 +12,6 @@ const RunnableNodeList = ({ items, onItemClick,script }) => {
   return (
     <ul>
     {items.map((item, index) => {
-      if (script) {
-        return (
-          <li
-            key={index}
-            onClick={() => handleItemClick(item)}
-            style={{
-              color: item === lastClickedItem ? 'red' : 'black',
-              cursor: 'pointer',
-            }}
-          >
-            <strong>{item}</strong>
-          </li>
-        );
-      } else {
         return (
           <li
             key={index}
@@ -33,10 +20,10 @@ const RunnableNodeList = ({ items, onItemClick,script }) => {
             <strong>{item.hostname}</strong>: {item.ip}
           </li>
         );
-      }
+    
     })}
   </ul>
   );
 };
 
-export default RunnableNodeList;
+export default AvailableNodesList;

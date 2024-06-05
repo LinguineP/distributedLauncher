@@ -93,9 +93,6 @@ def exit_gracefully():
 def wait_for_instructions():
     """reacts to commands sent to agent from server"""
 
-    # TODO probably some kind of auth should exist here
-    # TODO start command reaction---->test
-
     global _shell_active
 
     received = msg.receive_command()
@@ -116,7 +113,6 @@ def wait_for_instructions():
         exit_gracefully()
         return False
     elif received["message"] == "alive_ping":
-        # TODO:check which nodes crashed
         pass
     else:
         print("Unknown command")

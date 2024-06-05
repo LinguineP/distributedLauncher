@@ -19,7 +19,7 @@ def agentProcess():
     try:
         agent_active = True
         while agent_active:
-            # TODO: ping master address change detection make a reliability module
+
             if masterIpKey not in masterIpStore:
                 discovery()
 

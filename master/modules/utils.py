@@ -1,4 +1,5 @@
 import re
+from typing import Callable, List, Tuple
 
 
 def escape_chars(s):
@@ -18,19 +19,32 @@ def escape_chars(s):
     return "".join([escape_dict.get(char, char) for char in s])
 
 
-def extractIpfromString(inString):
+def extractIpfromString(inString: str) -> str:
     ip_pattern = r"\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b"
 
     ip_addresses = re.findall(ip_pattern, inString)
     return ip_addresses
 
 
-def replace_node_id(inString, node_num):
-    result = re.sub(r"\bid\b", str(node_num), inString)
+def replace_mip(inString: str, mip: str) -> str:
+    result = re.sub(r"\bmip\b", str(mip), inString)
     return result
 
 
-def remove_double_spaces(s):
-    while "  " in s:
-        s = s.replace("  ", " ")
-    return s
+def replace_node_id(inString: str, node_id: str) -> str:
+    result = re.sub(r"\bid\b", str(node_id), inString)
+    return result
+
+
+def remove_double_space(inString: str, substring: str):
+    while "  " in inString:
+        inString = inString.replace("  ", " ")
+    return inString
+
+
+def string_transformer(inString: str, transformations: List[Tuple[Callable, str]]):
+    "does all specified transformations on the string"
+
+    for function, param in transformations:
+        inString = function(inString, param)
+    return inString

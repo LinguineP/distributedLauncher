@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import '../../App.css'
 import './CommandParamsList.css';
-import CommunicationHandler from './../communicationHandlers/communicationHandler.ts';
+import CommunicationHandler from '../../services/communicationHandlers/communicationHandler.ts';
 
 const CommandParamsList = ({ paramsList ,itemClicked} ) => {
     const [items, setItems] = useState([]);
@@ -21,6 +22,7 @@ const CommandParamsList = ({ paramsList ,itemClicked} ) => {
                 await requestHandler.putCmdParam(id, updatedItem);
                 setItems(items.map(item => (item.id === id ? updatedItem : item)));
                 setEditingItemId(null);
+                handleItemClick(id,updatedItem.value)
             } catch (error) {
                 console.error('Error updating item:', error);
             }
@@ -71,16 +73,22 @@ const CommandParamsList = ({ paramsList ,itemClicked} ) => {
 
     return (
         <div className="list-container">
-            <div className="add-item-container">
-                <input
-                    type="text"
-                    value={newItemValue}
-                    onChange={(e) => setNewItemValue(e.target.value)}
-                    placeholder="Type new params setting"
-                    className="list-input"
-                />
-                <button className="list-button add-button" onClick={handleAddItemClick}>Add</button>
-            </div>
+             
+           <div className="add-item-container">
+                        <p className="small-text Attention-text" id='ParamsFormat'>
+                        Expected parameters format: numberOfNodes id (masternodeId) mip (application_specific_params)
+                        </p>
+                    <div className="add-item-input-row">
+                        <input
+                        type="text"
+                        value={newItemValue}
+                        onChange={(e) => setNewItemValue(e.target.value)}
+                        placeholder="Example parameters: 2 id 0 mip"
+                        className="list-input"
+                        />
+                        <button className="list-button add-button" onClick={handleAddItemClick}>Add</button>
+                    </div>
+        </div>
             <hr />
             <div className="list-container">
                 {items.map(item => (

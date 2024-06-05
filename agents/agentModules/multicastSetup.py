@@ -87,11 +87,9 @@ class MulticastSocket:
         self.is_opened = True
 
     def __del__(self):
-        # TODO: handle in gracefull exit
         if self.is_opened:
             self.free_sockets()
 
-    # TODO : ##FOOD_FOR_THOUGHT think about resource freeing and potential reuse
     def free_sockets(self):
         for socket in self.sockets:
             socket.close()

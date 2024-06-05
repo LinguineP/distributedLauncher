@@ -46,10 +46,9 @@ def startScan():
 
 @app.route("/api/startNodes", methods=["POST"])
 def startNodes():
-    # TODO: issue start command
     data = request.get_json()
-    # example data {'startParams': {'selectedScript': None, 'selectedNumberOfNodes': 2, 'selectedNodes': [{'hostname': 'pv_t480s', 'ip': '192.168.0.24'}]}} incoming data example
-    # executionRoutines.startScripts(data["startParams"])
+    # example data {'startParams': {'selectedScript': None, 'masterIp': '192.1.1.10',selectedParams:"3 id 0 mip", 'selectedNodes': [{'hostname': 'pv_t480s', 'ip': '192.168.0.24'}]}} incoming data example
+    print(data)
     executionRoutines.startScriptsPreset(data["startParams"])
 
     return "Success", 200
@@ -57,7 +56,6 @@ def startNodes():
 
 @app.route("/api/shutdownAgents", methods=["POST"])
 def shudownAgents():
-    # TODO : add node stopping to frontend look at app.js todos
     data = request.get_json()
     nodesAlive = data["stopParams"]["selectedNodes"]
     executionRoutines.shutdownAgentsGracefully(nodesAlive)
@@ -75,7 +73,7 @@ def createCommandParam():
         if not new_param or "value" not in new_param:
             return jsonify({"error": "Invalid input"}), 400
         print(new_param)
-        db_adapter.insert_params_setting(new_param["value"])
+        db_adapter.params.insert_setting(new_param["value"])
 
         return jsonify(new_param), 201
 
@@ -90,7 +88,7 @@ def readCommandParams():
     @return: json containing list of cmd params as a value for cmdParamsList key
     """
 
-    params_list = db_adapter.get_all_params_settings()
+    params_list = db_adapter.params.get_all_settings()
     availableScripts: list = dataProcessing.getAvailableScripts()
 
     return jsonify({"paramsList": params_list, "availableScripts": availableScripts})
@@ -110,7 +108,7 @@ def updateCommandParams(item_id):
             return jsonify({"error": "Invalid input"}), 400
 
         # Find the item by ID and update it
-        if db_adapter.update_params_setting(item_id, updated_param["value"]):
+        if db_adapter.params.update_setting(item_id, updated_param["value"]):
             return jsonify(updated_param), 200
 
         return jsonify({"error": "Item not found"}), 404
@@ -129,7 +127,7 @@ def deleteCommandParam(item_id):
 
     try:
 
-        if db_adapter.delete_params_setting(item_id):
+        if db_adapter.params.delete_setting(item_id):
             return jsonify({"message": "Item deleted"}), 200
         return jsonify({"error": "Item not found"}), 404
 
@@ -137,13 +135,11 @@ def deleteCommandParam(item_id):
         return jsonify({"error": str(e)}), 500
 
 
-# TODO: define cent decent choice in fe,currently hardcoded do docsstrings for masternode
 @app.route("/")
 def index():
     return render_template("index.html")
 
 
-# TODO: implement some kind of encription and probably digital signitures
 if __name__ == "__main__":
 
     print("Starting masterNode")

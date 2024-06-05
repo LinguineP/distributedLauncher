@@ -50,7 +50,6 @@ def receive_ip_from_multicast():
             return masterIp
 
 
-# TODO: ping the masternode
 def master_ping():
     pass
 

@@ -71,39 +71,19 @@ def receive_json(socket):
     return json_data
 
 
-def send_start(
-    dest_ip, script, numberOfNodes, nodeId, masterNodeId, masterNodeIp, decent
-):
-    message = {
-        "message": "start_node",
-        "script": script,
-        "numberOfNodes": numberOfNodes,
-        "currentNodeId": nodeId,
-        "masterNodeId": masterNodeId,
-        "masterNodeIp": masterNodeIp,
-        "decent": decent,
-    }
-    print(message)
-    send_json(dest_ip, portComm, message)
-
-
 def send_start_set_params(dest_ip, script, params):
     message = {"message": "start_node_params", "script": script, "params": params}
-    print(message)
-    send_json(dest_ip, portComm, message)
+    print("here" + str(message))
+    # send_json(dest_ip, portComm, message)  #TODO:uncomment this
 
 
 def send_json(dest_ip, dest_port, data_dict):
-    # Convert the dictionary to JSON
+
     json_data = json.dumps(data_dict)
 
-    # Create a socket object
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
-        # Connect to the server
         client_socket.connect((dest_ip, dest_port))
-
-        # Send the JSON data
         client_socket.sendall(json_data.encode("utf-8"))
         print("JSON data sent successfully.")
     finally:

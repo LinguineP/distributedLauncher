@@ -1,4 +1,5 @@
 
+
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -9,6 +10,7 @@
   font-size: calc(10px + 2vmin);
   color: white;
 }
+
 
 .App-link {
   color: #61dafb;
@@ -36,6 +38,21 @@
 
 .Button-text{
   font-size: large;
+  
+}
+
+.Attention-text{
+  color: #4c95d0;
+}
+
+.row{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-left: 10px;
+  margin-right: 10px;
+  padding-top: 0px;
+  padding-bottom: 0px;
   
 }
 
@@ -177,4 +194,54 @@ input{
   font-size: medium;
   border: 1px solid #dcdcdc;
   border-radius: 10px;
+}
+
+
+.navbar {
+  background-color: #20232A;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 64px;
+}
+
+.nav-list {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-item {
+  margin: 0 10px;
+}
+
+.nav-button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.nav-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-button.active {
+  border-bottom: 2px solid white;
+}
+
+.content {
+  flex-grow: 1;
+}
+
+
+
+
+#masterStar{
+  margin-left: 10px;
+  font-weight: 900;
+  font-style: normal;
 }
