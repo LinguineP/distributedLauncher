@@ -9,6 +9,7 @@ import DataVault from '../services/dataVault.ts'
 import CommunicationHandler from './../services/communicationHandlers/communicationHandler.ts';
 
 
+
 Modal.setAppElement('#root'); 
 
 function BenchmarkPanel() {
@@ -17,7 +18,8 @@ function BenchmarkPanel() {
     return new CommunicationHandler();
   }, []);
 
-  const [selectedSession, setSelectedSession] = useState('');
+  const [selectedSession, setSelectedSession] = useState(null);
+  const [selectedSessionName, setSelectedSessionName] = useState('');
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [newSessionName, setNewSessionName] = useState('');
   const [sessions, setSessions] = useState([]);
@@ -41,10 +43,13 @@ function BenchmarkPanel() {
   }, [requestHandler]);
 
 
-  
+  const findSession=(sessionName)=>{
+    return sessions.find(element => element['session_name'] === sessionName);
+  }
 
   const handleSelectionChange = (value) => {
-    setSelectedSession(value);
+    setSelectedSessionName(value)
+    setSelectedSession(findSession(value));
   };
 
   const openModal = () => {
@@ -71,7 +76,7 @@ function BenchmarkPanel() {
     if (newSessionName && lastClickedScriptText) {
       const newSession=requestHandler.postSession({'sessionName': newSessionName, 'sessionScript': lastClickedScriptText});
       setSessions([...sessions, newSession]);
-      setSelectedSession(newSessionName);
+      setSelectedSession(newSession);
       setNewSessionName('');
       closeModal();
     }
@@ -115,8 +120,8 @@ function BenchmarkPanel() {
         </div>
         <div className='sessionBody'>
           <div className='selectionOutline'>
-            {selectedSession !== '' && (
-              <SessionView sessionName={selectedSession} />
+            {selectedSessionName !== '' && (
+              <SessionView session={selectedSession} />
             )}
           </div>
         </div>
@@ -127,19 +132,21 @@ function BenchmarkPanel() {
         className="Modal"
         overlayClassName="Overlay"
         >
-            <div>
+            <div className='modal-container'>
               <h1 id='createSessionTitle'>Create a new session</h1>
               <div className='selectionOutline'>
                 <div className='altHalfDiv'>
                   <div className='borderedOutline'>
                     <h4 id='selectScripth4'> Select the session script</h4>
                     <hr/>
-                    <AvailableScriptsList 
-                      items={availableScripts}  
-                      onItemClick={itemWasClickedScript} 
-                      lastClickedScript={lastClickedScript} 
-                      setLastClickedScript={setLastClickedScript}
-                    />
+                    <div className='createSessionScripts'>
+                      <AvailableScriptsList 
+                        items={availableScripts}  
+                        onItemClick={itemWasClickedScript} 
+                        lastClickedScript={lastClickedScript} 
+                        setLastClickedScript={setLastClickedScript}
+                      />
+                    </div>
                   </div>
                 </div>
                 <div className='altHalfDiv'>
@@ -153,6 +160,7 @@ function BenchmarkPanel() {
                       />
                     </h4>
                     <hr />
+                    <div className='paddingClass'><p></p></div>
                     <div className='selectionOutline'>
                       <div className='altHalfDiv'>
                         <div className='buttonContainer'>

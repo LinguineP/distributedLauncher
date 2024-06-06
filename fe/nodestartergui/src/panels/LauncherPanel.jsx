@@ -24,6 +24,7 @@ function LauncherPanel() {
         const data = await requestHandler.getCmdParams();
         const dataVault = DataVault.getInstance();
         dataVault.setItem("scriptsList", data.availableScripts);
+        dataVault.setItem("paramsList", data.paramsList);
         setParamsList(data.paramsList);
         setAvailableScripts(data.availableScripts);
       } catch (error) {

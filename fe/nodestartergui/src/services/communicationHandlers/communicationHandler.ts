@@ -115,7 +115,7 @@ class CommunicationHandler {
   async getSessions() {
     try {
       const response = await axios.get(this.sessionUrl);
-      console.log("GET Response:", response.data);
+      //console.log("GET Response:", response.data);
       return response.data;
     } catch (error) {
       console.error("GET Error:", error);
