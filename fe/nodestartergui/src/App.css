@@ -6,10 +6,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   font-size: calc(10px + 2vmin);
   color: white;
+  position: relative;
 }
+
 
 
 .App-link {
@@ -35,6 +37,7 @@
   justify-content: center;
   
 }
+
 
 .Button-text{
   font-size: large;
@@ -180,6 +183,10 @@
   border-radius: 50%;
 }
 
+.list-text{
+  font-weight:bolder;
+}
+
 input:checked + .slider {
   background-color: #2196F3;
 }
@@ -236,6 +243,7 @@ input{
 .content {
   flex-grow: 1;
 }
+
 
 
 

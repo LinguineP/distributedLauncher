@@ -17,7 +17,7 @@ const AvailableNodesList = ({ items, onItemClick, }) => {
             key={index}
             onClick={() => handleItemClick(item)}
           >
-            <strong>{item.hostname}</strong>: {item.ip}
+            <p list-text>{item.hostname}</p>: {item.ip}
           </li>
         );
     

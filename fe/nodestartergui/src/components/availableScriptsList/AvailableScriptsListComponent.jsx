@@ -21,7 +21,7 @@ const AvailableScriptsList = ({ items, onItemClick }) => {
               cursor: 'pointer',
             }}
           >
-            <strong>{item}</strong>
+            <p list-text>{item}</p>
           </li>
         );
       

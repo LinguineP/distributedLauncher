@@ -135,6 +135,43 @@ def deleteCommandParam(item_id):
         return jsonify({"error": str(e)}), 500
 
 
+@app.route("/api/sessions", methods=["POST"])
+def createSession():
+    """
+    @brief: create a new session
+    """
+    try:
+
+        new_param = request.get_json()
+        if (
+            not new_param
+            or "sessionName" not in new_param
+            or "sessionScript" not in new_param
+        ):
+            return jsonify({"error": "Invalid input"}), 400
+        print(new_param)
+        db_adapter.sessions.insert_session(
+            new_param["sessionName"], new_param["sessionScript"]
+        )
+
+        return jsonify(new_param), 201
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/api/sessions", methods=["GET"])
+def readSessions():
+    """
+    @brief: get a list of sessions
+    @return: json containing list of cmd params as a value for cmdParamsList key
+    """
+
+    sessionList = db_adapter.sessions.get_all_sessions()
+
+    return jsonify(sessionList)
+
+
 @app.route("/")
 def index():
     return render_template("index.html")

@@ -1,15 +1,176 @@
 import '../App.css';
-import React from 'react';
+import './panels.css';
+import React, { useState,useEffect ,useMemo} from 'react';
+import Modal from 'react-modal';
+import SessionView from '../components/sessionView/SessionViewComponent';
+import DropdownMenu from '../components/dropdownMenu/DropdownMenuComponent';
+import AvailableScriptsList from '../components/availableScriptsList/AvailableScriptsListComponent';
+import DataVault from '../services/dataVault.ts'
+import CommunicationHandler from './../services/communicationHandlers/communicationHandler.ts';
 
+
+Modal.setAppElement('#root'); 
 
 function BenchmarkPanel() {
 
+   const requestHandler = useMemo(() => {
+    return new CommunicationHandler();
+  }, []);
+
+  const [selectedSession, setSelectedSession] = useState('');
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [newSessionName, setNewSessionName] = useState('');
+  const [sessions, setSessions] = useState([]);
+  const [availableScripts, setAvailableScripts] = useState([]);
+  const [lastClickedScriptText, setLastClickedScriptText] = useState("");
+  const [lastClickedScript, setLastClickedScript] = useState(null);
+  const selectSessionPlaceHolder = "--Select a session--";
+
+  
+
+  useEffect(() => {
+    const getSessionsList = async () => {
+      try {
+      const sessionList=await requestHandler.getSessions()
+      setSessions(sessionList)
+        } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    }
+    getSessionsList()
+  }, [requestHandler]);
+
+
+  
+
+  const handleSelectionChange = (value) => {
+    setSelectedSession(value);
+  };
+
+  const openModal = () => {
+    const dataVault = DataVault.getInstance();
+    const scripts = dataVault.getItem("scriptsList");
+    if (scripts) {
+      setAvailableScripts(scripts);
+    } else {
+      setAvailableScripts(['hello', 'there', 'general', 'kenobi']);
+    }
+
+    setModalIsOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalIsOpen(false);
+  };
+
+  const handleNewSessionNameChange = (e) => {
+    setNewSessionName(e.target.value);
+  };
+
+  const createNewSession = () => {
+    if (newSessionName && lastClickedScriptText) {
+      const newSession=requestHandler.postSession({'sessionName': newSessionName, 'sessionScript': lastClickedScriptText});
+      setSessions([...sessions, newSession]);
+      setSelectedSession(newSessionName);
+      setNewSessionName('');
+      closeModal();
+    }
+  };
+
+   const transformSessionsToItems = (sessions) => {
+    return sessions.map(session => ({
+      id: session.session_id,
+      name: session.session_name
+    }));
+  };
+
+
+
+  const itemWasClickedScript = (item) => {
+    setLastClickedScript(item);
+    setLastClickedScriptText(item); 
+
+  };
 
   return (
     <div className="App">
-        <div className='App-header'>
-    <h1>Benchmark</h1>
-    </div>
+      <header className='App-header'>
+        <div className='panelHeader'>
+          <div className='selectionOutline'>
+            <div className='altHalfDiv'>
+              <DropdownMenu 
+                placeholder={selectSessionPlaceHolder} 
+                items={sessions} 
+                onSelectionChange={handleSelectionChange}
+                selectedItem={selectedSession} 
+                transformFunction={transformSessionsToItems}
+              />
+            </div>
+            <div className='altHalfDiv'>
+              <div className='sessionButton'>
+                <button onClick={openModal}><p className=''>Make a new session</p></button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className='sessionBody'>
+          <div className='selectionOutline'>
+            {selectedSession !== '' && (
+              <SessionView sessionName={selectedSession} />
+            )}
+          </div>
+        </div>
+        <Modal
+        isOpen={modalIsOpen}
+        onRequestClose={closeModal}
+        contentLabel="Create New Session"
+        className="Modal"
+        overlayClassName="Overlay"
+        >
+            <div>
+              <h1 id='createSessionTitle'>Create a new session</h1>
+              <div className='selectionOutline'>
+                <div className='altHalfDiv'>
+                  <div className='borderedOutline'>
+                    <h4 id='selectScripth4'> Select the session script</h4>
+                    <hr/>
+                    <AvailableScriptsList 
+                      items={availableScripts}  
+                      onItemClick={itemWasClickedScript} 
+                      lastClickedScript={lastClickedScript} 
+                      setLastClickedScript={setLastClickedScript}
+                    />
+                  </div>
+                </div>
+                <div className='altHalfDiv'>
+                  <div className='borderedOutline'>
+                    <h4>
+                      <input className='createSessionInput' 
+                        type="text" 
+                        value={newSessionName} 
+                        onChange={handleNewSessionNameChange} 
+                        placeholder="Enter session name" 
+                      />
+                    </h4>
+                    <hr />
+                    <div className='selectionOutline'>
+                      <div className='altHalfDiv'>
+                        <div className='buttonContainer'>
+                          <button className='add-button' onClick={createNewSession}>Create</button>
+                        </div>
+                      </div>
+                      <div className='altHalfDiv'>
+                        <div className='buttonContainer'>
+                          <button className='cancel-button' onClick={closeModal}>Cancel</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </Modal>
+      </header>
     </div>
   );
 }

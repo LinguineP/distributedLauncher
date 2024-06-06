@@ -50,7 +50,7 @@ const SelectedNodesList = ({ items, onItemClick, onItemLongPress,updateSelectedC
           onMouseLeave={handleMouseLeave}
           onClick={() => handleItemClick(item)}
         >
-          <strong>{item.hostname}</strong>: {item.ip}
+          <p list-text>{item.hostname}</p>: {item.ip}
           {lastLongPressedItem === item && <span className='Attention-text' id='masterStar'>★</span>}
         </li>
       ))}

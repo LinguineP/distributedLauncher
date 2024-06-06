@@ -5,6 +5,7 @@ import SelectedNodesList from '../components/runnablenodeList/SelectedNodesListC
 import AvailableScriptsList from '../components/availableScriptsList/AvailableScriptsListComponent.jsx';
 import CommandParamsList from '../components/paramsList/CommandParamsList.jsx';
 import CommunicationHandler from '../services/communicationHandlers/communicationHandler.ts';
+import DataVault from '../services/dataVault.ts'
 
 function LauncherPanel() {
   const requestHandler = useMemo(() => {
@@ -21,7 +22,8 @@ function LauncherPanel() {
     const getParamsList = async () => {
       try {
         const data = await requestHandler.getCmdParams();
-        console.log(data.paramsList)
+        const dataVault = DataVault.getInstance();
+        dataVault.setItem("scriptsList", data.availableScripts);
         setParamsList(data.paramsList);
         setAvailableScripts(data.availableScripts);
       } catch (error) {

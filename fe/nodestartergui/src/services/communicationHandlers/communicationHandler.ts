@@ -2,6 +2,7 @@ import axios from "axios";
 
 class CommunicationHandler {
   private paramsUrl: string = "/api/cmdParams";
+  private sessionUrl: string = "/api/sessions";
 
   stopScan() {
     return axios
@@ -96,6 +97,28 @@ class CommunicationHandler {
       return response.data;
     } catch (error) {
       console.error("PUT Error:", error);
+      throw error;
+    }
+  }
+
+  async postSession(data: any) {
+    try {
+      const response = await axios.post(this.sessionUrl, data);
+      console.log("POST Response:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("POST Error:", error);
+      throw error;
+    }
+  }
+
+  async getSessions() {
+    try {
+      const response = await axios.get(this.sessionUrl);
+      console.log("GET Response:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("GET Error:", error);
       throw error;
     }
   }
