@@ -39,17 +39,10 @@
 
 .panelHeader {
     background-color: #282c34;
-    width: 100%;
+    width: 95%;
 }
 
-.sessionBody {
-    display: inline;
-    flex: 1;
-    position: relative;
-    overflow: auto;
 
-    width: 100%;
-}
 .Modal {
     position: absolute;
     top: 50%;
@@ -75,6 +68,25 @@
     right: 0;
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.527);
+}
+
+.sessionBody {
+        background-color: #282c34;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        font-size: calc(10px + 2vmin);
+        color: white;
+        position: relative;
+}
+
+
+/* Optional: Control the expansion of child elements */
+.sessionBody>* {
+    max-height: 100%;
+    /* Prevents children from expanding beyond the parent's height */
 }
 
 .sessionButton button {
@@ -224,4 +236,47 @@
 
 .paddingClass{
     padding: 10px;
+}
+
+.selectionOutlineAnalysis{
+    display: flex;
+    width: 95%;
+    height: min-content;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.altHalfDivAnalysis{
+        width: 50%;
+        height: 100%;
+        display: block;
+        align-items: center;
+}
+
+.alt75DivAnalysis{
+        width: 75%;
+        height: 100%;
+        display: block;
+        align-items: center;
+}
+
+
+.altHalfDivAnalysis p{
+    text-align: right;
+    margin-right:20%;
+    justify-self: center;
+    font-weight: 350;
+
+}
+
+.line{
+    width: 100%;
+    flex-direction: row;
+}
+
+.selectionOutlineNewSession{
+    display: flex;
+    width: 95%;
+    margin-left: 20px;
+    margin-right: 20px;
 }

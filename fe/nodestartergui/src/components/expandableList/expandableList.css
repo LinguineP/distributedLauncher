@@ -1,0 +1,30 @@
+.expandable-list {
+    width: 100%;
+    margin: 10%;
+
+}
+
+.expandable-item {
+    border-radius: 10px;
+    margin-bottom: 10px;
+    width: 100%;
+    padding: 10px;
+}
+
+.expandable-header {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.arrow {
+    margin-right: 10px;
+}
+
+.title {
+    font-weight: bold;
+}
+
+.expandable-content {
+    padding: 10px 0;
+}

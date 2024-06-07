@@ -1,5 +1,10 @@
 
-
+.App{
+  display: flex;
+  flex-direction: column;
+    
+    
+}
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -10,6 +15,10 @@
   font-size: calc(10px + 2vmin);
   color: white;
   position: relative;
+  padding: 10px;
+    /* Add padding to child divs */
+  box-sizing: border-box;
+  width: 100%;
 }
 
 
@@ -87,8 +96,7 @@
 }
 
 .wideOutline {
-  width: 95%;
-  height: 100%;
+  width: 100%;
   background-color: white;
   color: #282c34;
   margin: 10px;
@@ -161,7 +169,6 @@
     user-select: none;
     outline: none;
     transition: background-color 250ms, border-color 250ms, color 250ms;
-    padding: 10px 20px;
     font-size: 16px;
     cursor: pointer;
     min-width: 250px;

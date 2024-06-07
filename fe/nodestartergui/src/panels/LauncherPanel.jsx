@@ -8,6 +8,7 @@ import CommunicationHandler from '../services/communicationHandlers/communicatio
 import DataVault from '../services/dataVault.ts'
 
 function LauncherPanel() {
+  
   const requestHandler = useMemo(() => {
     return new CommunicationHandler();
   }, []);
@@ -21,10 +22,16 @@ function LauncherPanel() {
   useEffect(() => {
     const getParamsList = async () => {
       try {
-        const data = await requestHandler.getCmdParams();
         const dataVault = DataVault.getInstance();
-        dataVault.setItem("scriptsList", data.availableScripts);
-        dataVault.setItem("paramsList", data.paramsList);
+        let data
+        if(dataVault.getDirty("paramsList")){
+          data= await requestHandler.getCmdParams();
+        }
+        else{
+          data={'paramsList':dataVault.getItem("paramsList"),"availableScripts":dataVault.getItem("availableScripts")}
+        }
+
+        
         setParamsList(data.paramsList);
         setAvailableScripts(data.availableScripts);
       } catch (error) {
@@ -109,57 +116,65 @@ function LauncherPanel() {
   return (
     <div className="App">
       <header className="App-header">
-        <p className='buttonText'>Welcome to distributed Launcher</p>
+            <div className='panelHeader'>
+                  <div className='sessionBody'>
+                    <p className='buttonText'>Welcome to distributed Launcher</p>
+                    <button onClick={discovery} className="Action-button">
+                      <p className='Button-text'>{discoveryOn ? stopDiscoveryText : startDiscoveryText}</p>
+                    </button>
+                    <div className='line'>
+                                <hr />
+                    </div>
 
-        <button onClick={discovery} className="Action-button">
-          <p className='Button-text'>{discoveryOn ? stopDiscoveryText : startDiscoveryText}</p>
-        </button>
+                    <div className="selectionOutline">
+                      <div className="halfDiv">
+                        <div className='row'>
+                        <p>Available Nodes</p>
+                        </div>
+                        <hr></hr>
+                        <AvailableNodesList items={availableNodes}  onItemClick={itemWasClickedAvailable} />
+                      </div>
+                      <div className="halfDiv">
+                        <div className='row'>
+                        <p>Selected Nodes</p>
+                        <p>{numberOfSelectedNodes}</p>
+                        </div>
+                        <hr></hr>
+                        <SelectedNodesList items={selectedNodes}  onItemClick={itemWasClickedSelected} updateSelectedCount={updateSelectedCount} onItemLongPress={handleItemLongPress}/>
+                      </div>
+                    </div>
 
-        <div className="selectionOutline">
-          <div className="halfDiv">
-            <div className='row'>
-            <p>Available Nodes</p>
+                    <div className="wideOutline">
+                      <div className='row'>
+                      <p>Available Scripts</p>
+                      </div>
+                      <hr></hr>
+                      <AvailableScriptsList items={availableScripts}  onItemClick={itemWasClickedScript} lastClickedScript={lastClickedScript} setLastClickedScript={setLastClickedScript} />
+                    </div>
+
+                    <div className="wideOutline">
+                      <div className="selectionOutline">
+                        <CommandParamsList paramsList={paramsList}
+                        itemClicked={(value)=>{setLastClickedParamsText(value) }} />
+                      </div>
+                    </div>
+                    <div className='line'>
+                                <hr />
+                    </div>
+                    <div className="selectionOutline">
+                      <div className="altHalfDiv">
+                        <div className='buttonContainer'>
+                          <button onClick={startRemote}><p className='Button-text'>Start Scripts</p></button>
+                        </div>
+                      </div>
+                      <div className="altHalfDiv">
+                        <div className='buttonContainer'>
+                          <button onClick={stopRemote}><p className='Button-text'>Shutdown Nodes</p></button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
             </div>
-            <hr></hr>
-            <AvailableNodesList items={availableNodes}  onItemClick={itemWasClickedAvailable} />
-          </div>
-          <div className="halfDiv">
-            <div className='row'>
-            <p>Selected Nodes</p>
-            <p>{numberOfSelectedNodes}</p>
-            </div>
-            <hr></hr>
-            <SelectedNodesList items={selectedNodes}  onItemClick={itemWasClickedSelected} updateSelectedCount={updateSelectedCount} onItemLongPress={handleItemLongPress}/>
-          </div>
-        </div>
-
-        <div className="wideOutline">
-          <div className='row'>
-          <p>Available Scripts</p>
-          </div>
-          <hr></hr>
-          <AvailableScriptsList items={availableScripts}  onItemClick={itemWasClickedScript} lastClickedScript={lastClickedScript} setLastClickedScript={setLastClickedScript} />
-        </div>
-
-        <div className="wideOutline">
-          <div className="selectionOutline">
-            <CommandParamsList paramsList={paramsList}
-            itemClicked={(value)=>{setLastClickedParamsText(value) }} />
-          </div>
-        </div>
-
-        <div className="selectionOutline">
-          <div className="altHalfDiv">
-            <div className='buttonContainer'>
-              <button onClick={startRemote}><p className='Button-text'>Start Scripts</p></button>
-            </div>
-          </div>
-          <div className="altHalfDiv">
-            <div className='buttonContainer'>
-              <button onClick={stopRemote}><p className='Button-text'>Shutdown Nodes</p></button>
-            </div>
-          </div>
-        </div>
       </header>
     </div>
   );

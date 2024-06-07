@@ -61,7 +61,7 @@ class SQLiteDBAdapter:
                 CREATE TABLE IF NOT EXISTS batches (
                     batch_id INTEGER PRIMARY KEY AUTOINCREMENT,
                     session_id INT REFERENCES sessions(session_id),
-                    param_id INT REFERENCES params_table(id),
+                    param_used VARCHAR(255) NOT NULL,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
             """

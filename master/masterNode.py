@@ -172,6 +172,18 @@ def readSessions():
     return jsonify(sessionList)
 
 
+@app.route("/api/sessions/batchParams", methods=["GET"])
+def readBatchParams():
+    """
+    @brief: get a list of sessions
+    @return: json containing list of cmd params as a value for cmdParamsList key
+    """
+    # TODO:implement getting batch params
+    sessionList = db_adapter.sessions.get_all_sessions()
+
+    return jsonify(sessionList)
+
+
 @app.route("/")
 def index():
     return render_template("index.html")
