@@ -50,6 +50,6 @@ class DataVault {
   }
 }
 
-//simple caching, components should only
+//simple caching
 
 export default DataVault;
