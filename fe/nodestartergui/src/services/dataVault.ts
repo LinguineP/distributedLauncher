@@ -16,27 +16,42 @@ class DataVault {
   }
 
   public setItem(key: string, value: any): void {
-    if (!this.storage.has(key)) {
-      this.storage.set(key, []);
+    if (!Array.isArray(value)) {
+      value = [value];
     }
-    this.storage.get(key)!.push(value);
+
+    // Filter out undefined values
+    value = value.filter((item) => item !== undefined);
+
+    if (value.length === 0) {
+      return;
+    }
+
+    const newValue = this.storage.has(key)
+      ? this.storage
+          .get(key)!
+          .concat(value)
+          .filter((item) => item !== undefined) // Ensure no undefined values in concatenated result
+      : value;
+
+    this.storage.set(key, newValue);
     this.dirty.set(key, false);
   }
 
-  public setDirty(key: string) {
-    this.dirty.set(key, false);
+  public setDirty(key: string): void {
+    this.dirty.set(key, true); // Mark as dirty by setting to true
   }
 
   public getItem(key: string): any[] | undefined {
     return this.storage.get(key);
   }
 
-  public getDirty(key: string): any {
+  public getDirty(key: string): boolean {
     let ret = this.dirty.get(key);
     if (ret === undefined) {
-      ret = true; //if dirty doesnt exist that means that the item doesnt exist =>should make a request
+      ret = true; // If dirty doesn't exist, the item doesn't exist => should make a request
     }
-    return ret;
+    return ret; //returns true if item is dirty(outdated or doesnt exits)
   }
 
   public removeItem(key: string): void {
@@ -49,7 +64,5 @@ class DataVault {
     this.dirty.clear();
   }
 }
-
-//simple caching
 
 export default DataVault;

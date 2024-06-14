@@ -56,6 +56,9 @@ function LauncherPanel() {
       return;
     }
     const response = await requestHandler.stopScan();
+    const dataVault = DataVault.getInstance();
+    dataVault.setItem("availableNodes",response.availableNodes)
+    
     setAvailableNodes(response.availableNodes);
   };
 
@@ -66,8 +69,8 @@ function LauncherPanel() {
     
     
     const requestParams = {
-      selectedScript: lastClickedScriptText, // Use the text content of the last clicked script
-      selectedParams: lastClickedParamsText, // Use the text content of the last clicked params
+      selectedScript: lastClickedScriptText, 
+      selectedParams: lastClickedParamsText, 
       selectedNodes: selectedNodes,
       masterNodeIp: longPressedItem.ip
     }

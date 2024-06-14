@@ -73,8 +73,7 @@ const CommandParamsList = ({ paramsList ,itemClicked} ) => {
 
     return (
         <div className="list-container">
-             
-           <div className="add-item-container">
+            <div className="add-item-container">
                         <p className="small-text Attention-text" id='ParamsFormat'>
                         Expected parameters format: numberOfNodes id (masternodeId) mip (application_specific_params)
                         </p>

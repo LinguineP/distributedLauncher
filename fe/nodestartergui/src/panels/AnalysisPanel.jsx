@@ -1,20 +1,12 @@
 import '../App.css';
 import './panels.css';
-import React, { useState,useEffect ,useMemo} from 'react';
-import Modal from 'react-modal';
-import SessionView from '../components/sessionView/SessionViewComponent';
+import React, { useState,useEffect ,useMemo, useCallback} from 'react';
 import DropdownMenu from '../components/dropdownMenu/DropdownMenuComponent';
-import AvailableScriptsList from '../components/availableScriptsList/AvailableScriptsListComponent';
 import DataVault from '../services/dataVault.ts'
 import CommunicationHandler from './../services/communicationHandlers/communicationHandler.ts';
-import App from './../App';
-import CommandParamsList from './../components/paramsList/CommandParamsList';
-import ExpandableItem from '../components/expandableList/expandableList.jsx';
 import ExpandableList from '../components/expandableList/expandableList.jsx';
 
 
-
-Modal.setAppElement('#root'); 
 
 function AnalysisPanel() {
 
@@ -23,18 +15,34 @@ function AnalysisPanel() {
     }, []);
 
     const [selectedSession, setSelectedSession] = useState(null);
+    const [sessionsItems, setSessionsItems] = useState([]);
     const [selectedSessionName, setSelectedSessionName] = useState('');
 
-    const [sessions, setSessions] = useState([{session_id: 1,session_name: "newSessionName", session_script: "lastClickedScriptText"}]);
+    const [sessions, setSessions] = useState([]);
 
     const selectSessionPlaceHolder = "--Select a session--";
 
 
+    const transformSessionsToItems = useCallback(() => {
+        const items = sessions.map(item => {
+        if (item && item.session_id && item.session_name) {  
+            return {
+            id: item.session_id,
+            name: item.session_name
+            };
+        }
+        console.error('Invalid session item:', item);  
+        return null;
+        }).filter(item => item !== null);  
+        
+        setSessionsItems(items);
+    }, [sessions]);
 
-    const [paramsList, setParamsList] = useState(["2 3 504"]);
-    const [selectedParam, setSelectedParam] = useState(null);
-    const [selectedParamName, setSelectedParamName] = useState('');
-
+    useEffect(() => {
+        if (sessions.length) {
+            transformSessionsToItems();
+        }
+    }, [sessions, transformSessionsToItems]);
 
     useEffect(() => {
 
@@ -58,7 +66,7 @@ function AnalysisPanel() {
         }
 
 
-        const getBatchParams=async () => {
+    const getBatchParams=async () => {
             try {
 
                 const dataVault = DataVault.getInstance();
@@ -77,8 +85,8 @@ function AnalysisPanel() {
             }
         }
 
-        //getSessionsList();
-        //getBatchParams();
+        getSessionsList();
+        getBatchParams();
 
     
     }, [requestHandler]);
@@ -93,30 +101,6 @@ function AnalysisPanel() {
         setSelectedSession(findSession(value));
     };
 
-    const handleSelectionParamChange = (value) => {
-        setSelectedParamName(value)
-        setSelectedParam(findSession(value));
-    };
-
-
-    
-
-
-
-
-    const transformSessionsToItems = (sessions) => {
-        return sessions.map(session => ({
-            id: session.session_id,
-            name: (session.session_name+' ('+session.session_script+')')
-        }));
-    };
-
-    const transformParamsToItems = (paramsList) => {
-        return paramsList.map(param=> ({
-            id : 1,
-            name: param
-        }));
-    };
 
 
 
@@ -132,10 +116,9 @@ return (
                         <div className='alt75DivAnalysis'>
                             <DropdownMenu 
                             placeholder={selectSessionPlaceHolder} 
-                            items={sessions} 
+                            items={sessionsItems} 
                             onSelectionChange={handleSelectionSessionChange}
                             selectedItem={selectedSession} 
-                            transformFunction={transformSessionsToItems}
                             />
                         </div>
                     </div>

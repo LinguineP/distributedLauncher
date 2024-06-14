@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './DropdownMenuComponent.css';
 
-const DropdownMenu = ({ placeholder, items, onSelectionChange, selectedItem, transformFunction }) => {
+const DropdownMenu = ({ placeholder, items, onSelectionChange, selectedItem }) => {
   const [localSelectedItem, setLocalSelectedItem] = useState('');
 
   useEffect(() => {
@@ -14,8 +14,6 @@ const DropdownMenu = ({ placeholder, items, onSelectionChange, selectedItem, tra
     onSelectionChange(value);
   };
 
-  const transformedItems = transformFunction ? transformFunction(items) : items;
-
   return (
     <div className="dropdown-container">
       <select
@@ -25,7 +23,7 @@ const DropdownMenu = ({ placeholder, items, onSelectionChange, selectedItem, tra
         onChange={handleChange}
       >
         <option value="">{placeholder}</option>
-        {transformedItems.map(item => (
+        {items.map(item => (
           <option key={item.id} value={item.name}>
             {item.name}
           </option>

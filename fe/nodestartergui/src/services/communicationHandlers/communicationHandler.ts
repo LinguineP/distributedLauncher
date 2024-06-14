@@ -61,7 +61,6 @@ class CommunicationHandler {
   async postCmdParam(data: any) {
     try {
       const response = await axios.post(this.paramsUrl, data);
-      console.log("POST Response:", response.data);
       const dataVault = DataVault.getInstance(); //cache, note available scripts do not change in runtime
       dataVault.setItem("paramsList", response.data.paramsList); //puts the intem in the shared Cache  and resets the dirty flag
       return response.data;
@@ -74,14 +73,12 @@ class CommunicationHandler {
   async getCmdParams() {
     try {
       const response = await axios.get(this.paramsUrl);
-      console.log("GET Response:", response.data);
       const dataVault = DataVault.getInstance(); //cache
       if (dataVault.getItem("paramsList")) {
         dataVault.removeItem("paramsList");
       }
       dataVault.setItem("paramsList", response.data.paramsList); //puts the intem in the shared Cache  and resets the dirty flag
       if (!dataVault.getItem("availableScripts")) {
-        console.log("only the first time setting the available scripts");
         dataVault.setItem("availableScripts", response.data.availableScripts); //here we need to write available scripts as well
       }
       return response.data;
@@ -94,7 +91,6 @@ class CommunicationHandler {
   async deleteCmdParam(id: number) {
     try {
       const response = await axios.delete(`${this.paramsUrl}/${id}`);
-      console.log("DELETE Response:", response.data);
       const dataVault = DataVault.getInstance(); //cache
       dataVault.setDirty("paramsList");
       return response.data;
@@ -107,7 +103,6 @@ class CommunicationHandler {
   async putCmdParam(id: number, data: any) {
     try {
       const response = await axios.put(`${this.paramsUrl}/${id}`, data);
-      console.log("PUT Response:", response.data);
       const dataVault = DataVault.getInstance(); //cache
       dataVault.setDirty("paramsList");
       return response.data;
@@ -121,9 +116,8 @@ class CommunicationHandler {
   async postSession(data: any) {
     try {
       const response = await axios.post(this.sessionUrl, data);
-      console.log("POST Response:", response.data);
       const dataVault = DataVault.getInstance(); //cache, note available scripts do not change in runtime
-      dataVault.setItem("sessionList", response.data.paramsList); //puts the intem in the shared Cache  and resets the dirty flag
+      dataVault.setItem("sessionList", response.data.sessionList); //puts the intem in the shared Cache  and resets the dirty flag
       return response.data;
     } catch (error) {
       console.error("POST Error:", error);
@@ -161,6 +155,26 @@ class CommunicationHandler {
       throw error;
     }
   }
+
+  //-------- processing realted --------------------
+  fetchDataMeasuringStatus = async () => {
+    try {
+      const response = await axios.get("/api/measuringStatus");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching processing status:", error);
+      throw error;
+    }
+  };
+
+  startMeasuringTask = async (data) => {
+    try {
+      await axios.post("/api/startMeasuring", data);
+    } catch (error) {
+      console.error("Error starting data processing:", error);
+      throw error;
+    }
+  };
 }
 
 export default CommunicationHandler;
