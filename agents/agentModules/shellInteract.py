@@ -79,8 +79,6 @@ class ShellHandler:
         if sys.platform == "win32":
             command += "\r\n"  # needed for the windows command to pass
         output, error = self.process.communicate(command)
-        print(error)
-        print(output)
         self.close_shell()
         return output, error
 

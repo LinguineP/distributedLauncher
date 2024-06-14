@@ -13,6 +13,7 @@ masterIp = ""
 multicastGroup = "239.255.10.1"  # viewRFC2365
 multicastPort = 55001  # not a known port number
 commPort = 55002
+resultsPort = 55003
 masterIp = ""
 agentIp = ""
 
@@ -108,6 +109,11 @@ def receive_json(socket):
     json_data = json.loads(data.decode("utf-8"))
     print("Received JSON:", json_data)
     return json_data
+
+
+def sendResults(runOutput, runTime):
+    results_msg = {"runOutput": runOutput, "runTime": runTime}
+    send_json(masterIp, resultsPort, results_msg)
 
 
 def send_hello():
