@@ -1,14 +1,19 @@
 from flask import Flask, render_template, jsonify, request
-
+import multiprocessing as mp
 from modules import asyncBeaconRoutines as asyncBeacon
 from modules import dataProcessing
 from modules import executionRoutines
 from modules import dbAdapter
-import multiprocessing as mp
+from modules import dataAnalasys
 
 
 app = Flask(__name__, static_folder="static/static", template_folder="static")
+
 db_adapter = dbAdapter.SQLiteDBAdapter()
+
+data_passer: dbAdapter.SQLiteDBAdapter.DataPasser = (
+    dbAdapter.SQLiteDBAdapter().dataPasser
+)
 
 
 masterIp = ""
@@ -73,9 +78,9 @@ def createCommandParam():
         if not new_param or "value" not in new_param:
             return jsonify({"error": "Invalid input"}), 400
         print(new_param)
-        db_adapter.params.insert_setting(new_param["value"])
+        ret = db_adapter.params.insert_setting(new_param["value"])
 
-        return jsonify(new_param), 201
+        return jsonify({"paramsList": [ret]}), 201
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -150,11 +155,11 @@ def createSession():
         ):
             return jsonify({"error": "Invalid input"}), 400
         print(new_param)
-        db_adapter.sessions.insert_session(
+        ret = db_adapter.sessions.insert_session(
             new_param["sessionName"], new_param["sessionScript"]
         )
 
-        return jsonify(new_param), 201
+        return jsonify([ret]), 201
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -184,6 +189,52 @@ def readBatchParams():
     return jsonify(sessionList)
 
 
+@app.route("/api/measuringStatus", methods=["GET"])
+def measuringStatus():
+
+    if data_passer.exists("status") and data_passer.exists("repetitionNumber"):
+        status = {
+            "status": data_passer.retrieve("status"),
+            "repetitionNumber": data_passer.retrieve("repetitionNumber"),
+        }
+    else:
+        status = {"status": "idle", "repetitionNumber": -1}
+
+    return jsonify(status)
+
+
+@app.route("/api/startMeasuring", methods=["POST"])
+def startMeasuring():
+
+    data = request.get_json()
+    print(data)
+    executionRoutines.startNMeasurements(data)
+
+    print(data_passer.retrieve("status"))
+
+    return "Success", 200
+
+
+@app.route("/api/doAnalasys", methods=["POST"])
+def doAnalasys():
+
+    data = request.get_json()
+
+    dataAnalasys.do_analysis(data["session_id"], data["session_name"])
+
+    return "Success", 200
+
+
+@app.route("/api/exportCSV", methods=["POST"])
+def exportCSV():
+
+    data = request.get_json()
+
+    dataAnalasys.generate_csv_from_combined_data()
+
+    return "Success", 200
+
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -192,6 +243,5 @@ def index():
 if __name__ == "__main__":
 
     print("Starting masterNode")
-
     app.debug = True
     app.run(host="0.0.0.0", port=8080)

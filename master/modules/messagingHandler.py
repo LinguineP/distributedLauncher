@@ -1,10 +1,17 @@
 import socket
 import json
+import dbAdapter
+
+
+data_passer: dbAdapter.SQLiteDBAdapter.DataPasser = (
+    dbAdapter.SQLiteDBAdapter().dataPasser
+)
 
 
 multicastGroup = "239.255.10.1"  # reserved range for local assignment by IANA
 portMulticast = 55001  # not a known port number
 portComm = 55002  # separate port for direct communication
+portResults = 55003  # separate port for results gathering
 connectionTimeout = 0.5
 masterIp = ""
 
@@ -27,6 +34,7 @@ def get_local_ip():
 def send_ip_to_multicast():
     global portMulticast, masterIp
     masterIp = get_local_ip()
+    data_passer.store("masterIp", masterIp)
     message = masterIp.encode("utf-8")
     multicast_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     multicast_socket.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 1)
