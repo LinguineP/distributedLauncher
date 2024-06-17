@@ -10,9 +10,9 @@ def run_script(script_cmd: str):
     print("\n------------------------------------------------------------\n")
     handler = ShellHandler()
 
-    start_time = time.time()
+    start_time = time.perf_counter()
     output, error = handler.run_command(script_cmd)
-    end_time = time.time()
+    end_time = time.perf_counter()  # perf counter more precise
 
     execution_time = end_time - start_time
 
