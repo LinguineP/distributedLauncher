@@ -9,6 +9,7 @@ import NumberInput from '../numberInput/numberInputComponent';
 import CommunicationHandler from './../../services/communicationHandlers/communicationHandler.ts';
 import AvailableNodesList from './../runnablenodeList/AvailableNodesListComponent';
 import SelectedNodesList from './../runnablenodeList/SelectedNodesListComponent';
+import ProgressBar from '../progressBar/ProgressBar.jsx';
 
 function SessionView({ session }) {
   const [lastClickedParamsText, setLastClickedParamsText] = useState("");
@@ -17,7 +18,9 @@ function SessionView({ session }) {
   const [selectedNodes, setSelectedNodes] = useState([]);
   const [numberOfReps, setNumberOfReps] = useState(0);
   const [measuringActive, setMeasuringActive] = useState(false);
-  const [processingStatus, setProcessingStatus] = useState({ status: "idle", message: "" });
+  const [processingStatus, setProcessingStatus] = useState({ status: "idle", repetitionNumber: "" });
+  const [currentNumber, setCurrentNumber] = useState(0);
+  const [maxNumber, setMaxNumber] = useState(0);
 
   const requestHandler = useMemo(() => {
     return new CommunicationHandler();
@@ -35,6 +38,7 @@ function SessionView({ session }) {
 
 
     const startMeasurement = async () => {
+        setMaxNumber(numberOfReps)
         const measurmentParams = {
           selectedScript: session.session_script, 
           selectedParams: lastClickedParamsText, 
@@ -59,9 +63,12 @@ function SessionView({ session }) {
     if (measuringActive) {
       try {
         const status = await requestHandler.fetchDataMeasuringStatus();
+        setCurrentNumber(Number(status.repetitionNumber))
         setProcessingStatus(status);
         if(status.status==="idle"){
           setMeasuringActive(false)
+          setMaxNumber(0)
+          setCurrentNumber(0)
         }
       } catch (error) {
         console.error('Error fetching processing status:', error);
@@ -176,6 +183,9 @@ function SessionView({ session }) {
             <button onClick={measurmenRoutine}><p className='Button-text'>Start measuring</p></button>
           </div>
         </div>
+      </div>
+      <div className="selectionOutline">
+        {measuringActive ? <ProgressBar  currentNumber={currentNumber} maxNumber={maxNumber} />:<></>}
       </div>
     </div>
   );
