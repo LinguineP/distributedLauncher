@@ -170,7 +170,7 @@ class SQLiteDBAdapter:
                 CREATE TABLE IF NOT EXISTS data_passer (
                     key_id INTEGER PRIMARY KEY AUTOINCREMENT,
                     key_name VARCHAR(255) UNIQUE NOT NULL,
-                    value VARCHAR(255) NOT NULL,
+                    value VARCHAR(255) NOT NULL
                 );
                 """
             )
@@ -258,7 +258,7 @@ class SQLiteDBAdapter:
             self.adapter = adapter
 
         def create_new_batch(self, session_id, param_used, number_of_nodes):
-            with sqlite3.connect(self.db_path) as conn:
+            with sqlite3.connect(self.adapter.db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute(
                     """
@@ -271,7 +271,7 @@ class SQLiteDBAdapter:
                 return cursor.lastrowid
 
         def get_param_used_by_batch_id(self, batch_id):
-            with sqlite3.connect(self.db_path) as conn:
+            with sqlite3.connect(self.adapter.db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute(
                     """
@@ -409,7 +409,7 @@ class SQLiteDBAdapter:
             except sqlite3.Error as e:
                 print("Error occurred:", e)
 
-        def get_batch_results_for_session(self, db_path, session_id):
+        def get_batch_results_for_session(self, session_id):
             batch_results = []
             try:
                 with sqlite3.connect(self.adapter.db_path) as conn:
@@ -460,7 +460,7 @@ class SQLiteDBAdapter:
                 print("Error occurred:", e)
 
         def reset_session_results(self, session_id):
-            with sqlite3.connect(self.db_path) as conn:
+            with sqlite3.connect(self.adapter.db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute(
                     "DELETE FROM sessions_results WHERE session_id = ?;", (session_id,)

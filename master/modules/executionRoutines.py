@@ -35,11 +35,11 @@ def startRepetition(params, runNumber):
 
     startScriptsPreset(params, measure=True)
 
-    numberOfNodes = data_passer.retrieve("numberOfNodes")
+    numberOfNodes = int(data_passer.retrieve("numberOfNodes"))
 
     listener_thread = threading.Thread(
         target=rg.results_listener,
-        args=(msg.masterIp, msg.portComm, numberOfNodes, stop_event, message_queue),
+        args=(msg.masterIp, msg.portResults, numberOfNodes, stop_event, message_queue),
     )
     listener_thread.start()
 
@@ -107,7 +107,7 @@ def startScriptsPreset(params, measure=False):
     if paramsAsList[2] != "mip":
         firstNodeId = paramsAsList[2]
         nodeParams = utils.replace_node_id(selectedParams, firstNodeId)
-        msg.send_start_set_params(masterIp, selectedScript, nodeParams)
+        msg.send_start_set_params(masterIp, selectedScript, nodeParams, measure)
     nodeId = 0
     # iterates over selected nodes this is ok because it allows for some nodes to be manualy started
     for node in selectedNodes:

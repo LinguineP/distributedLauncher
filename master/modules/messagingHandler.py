@@ -87,7 +87,7 @@ def send_start_set_params(dest_ip, script, params, measure):
         "measure": measure,
     }
     print("here" + str(message))
-    # send_json(dest_ip, portComm, message)  #TODO:uncomment this
+    send_json(dest_ip, portComm, message)  # TODO:uncomment this
 
 
 def send_json(dest_ip, dest_port, data_dict):

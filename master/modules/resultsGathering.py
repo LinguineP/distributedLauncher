@@ -18,7 +18,6 @@ def ingest_result(message):
     answerCounter = int(data_passer.retrieve("answerCounter"))
     currentRunId = data_passer.retrieve("currentRunId")
     nodeId = db_adapter.nodes.get_node_id(message["hostname"], message["ip"])
-
     db_adapter.node_data.create_node_data(
         currentRunId, nodeId, message["runOutput"], message["runTime"]
     )
@@ -36,11 +35,10 @@ def process_queue_messages(message_queue, stop_event):
 
 
 def handle_client_connection(client_socket, message_queue, stop_event):
-    while not stop_event.is_set():
+    while not stop_event.is_set() or not message_queue.empty():
         data = client_socket.recv(1024)
         if data:
             message = data.decode("utf-8")
-            print(f"Received message: {message}")
             try:
                 json_message = json.loads(message)
                 message_queue.put(json_message)
@@ -62,7 +60,6 @@ def results_listener(host, port, numberOfexpectedClis, stop_event, message_queue
     server_socket.bind((host, port))
 
     server_socket.listen(numberOfexpectedClis)
-    print(f"Server listening on {host}:{port}")
 
     threads = []
     while not stop_event.is_set():
