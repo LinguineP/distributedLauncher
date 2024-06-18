@@ -1,4 +1,5 @@
 import csv
+import os
 import dbAdapter
 import utils
 from config import cfg
@@ -12,8 +13,8 @@ db_adapter = dbAdapter.SQLiteDBAdapter()
 def generate_csv_from_combined_data():
     # data from all sessions or just from one?
     current_datetime = datetime.now()
-    filename = current_datetime.strftime("%Y-%m-%d_%H:%M:%S")
-    filepathname = utils.escape_chars(f"{cfg['dbPath']}\{'csv'}\{filename}")
+    filename = current_datetime.strftime("%Y-%m-%d_%H-%M-%S")
+    filepathname = utils.escape_chars(f"{cfg['dbPath']}\{'csv'}\{filename}.csv")
 
     data = db_adapter.analysis.get_detailed_combined_data()
 
@@ -55,13 +56,19 @@ def calculate_standard_deviation(times):
     return std_deviation
 
 
-def plot_times_with_stats(session_name, batch_param, times, unit):
+def plot_times_with_stats(session_name: str, batch_param, times, unit, batchId):
     # Calculate mean time and standard deviation
     mean_time = calculate_mean_time(times)
     std_deviation = calculate_standard_deviation(times)
 
     current_datetime = datetime.now()
-    filename = session_name + "_" + current_datetime.strftime("%Y-%m-%d_%H:%M:%S")
+    filename = (
+        session_name
+        + "_"
+        + str(batchId)
+        + "_"
+        + current_datetime.strftime("%Y-%m-%d_%H-%M-%S")
+    )
     save_path = utils.escape_chars(
         f"{cfg['dbPath']}\{'images'}\{session_name}\batchresults\{filename}"
     )
@@ -87,52 +94,16 @@ def plot_times_with_stats(session_name, batch_param, times, unit):
     plt.title(
         "Execution times distribution in session "
         + session_name
-        + "with params"
+        + " with params "
         + batch_param
     )
 
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
     plt.savefig(save_path)
+    plt.clf()
 
     return std_deviation, mean_time, save_path
-
-
-def convert_times(list_of_times):
-
-    max_time = max(
-        list_of_times
-    )  # we re basing our conversion on a max value, so that every value is properly represented
-
-    if max_time < 1e-6:
-        # Convert to ns
-        converted_times = [time * 1e9 for time in list_of_times]
-        unit = "ns"
-    elif max_time < 1e-3:
-        # Convert to microseconds
-        converted_times = [time * 1e6 for time in list_of_times]
-        unit = "µs"
-    elif max_time < 1:
-        # Convert to ms
-        converted_times = [time * 1e3 for time in list_of_times]
-        unit = "ms"
-    else:
-        # just seconds
-        converted_times = list_of_times
-        unit = "s"
-
-    return converted_times, unit
-
-
-def convert_to_seconds(value, unit):
-    if unit == "ns":
-        return value / 1e9
-    elif unit == "µs":
-        return value / 1e6
-    elif unit == "ms":
-        return value / 1e3
-    elif unit == "s":
-        return value
-    else:
-        raise ValueError("Invalid unit of measurement")
 
 
 def analyse_session_batches(session_id, session_name):
@@ -142,19 +113,16 @@ def analyse_session_batches(session_id, session_name):
     )
 
     for batch in session_batches_data:
-        times, unit = convert_times(batch["batch_times"])
+        times, unit = batch["batch_times"], "s"
         std_deviation, mean, graph_path = plot_times_with_stats(
-            session_name, batch["param_used"], times, unit
+            str(session_name), batch["param_used"], times, unit, batch["batch_id"]
         )
         db_adapter.batch_results.insert_batch_result(
-            batch["batch_id"],
-            convert_to_seconds(std_deviation, unit),
-            convert_to_seconds(mean, unit),
-            graph_path,
+            batch["batch_id"], std_deviation, mean, graph_path
         )
 
 
-def plot_meantime_nodes_number(session_name, nodes, meantime, unit):
+def plot_meantime_nodes_number(session_name, nodes, meantime, unit, batchId):
 
     current_datetime = datetime.now()
     filename = (
@@ -162,29 +130,39 @@ def plot_meantime_nodes_number(session_name, nodes, meantime, unit):
         + "_"
         + "meantime"
         + "_"
-        + current_datetime.strftime("%Y-%m-%d_%H:%M:%S")
+        + current_datetime.strftime("%Y-%m-%d_%H-%M-%S")
     )
     save_path = utils.escape_chars(
         f"{cfg['dbPath']}\{'images'}\{session_name}\{filename}"
     )
 
+    nodes = [int(node) for node in nodes]
+
     plt.plot(nodes, meantime, "o", label="Mean time as functions of number of nodes")
 
-    # Draw line connecting points
+    for i, txt in enumerate(batchId):
+        plt.annotate(txt, (nodes[i], meantime[i]))
+
     plt.plot(nodes, meantime, "r-", alpha=0.3)
 
-    # Add labels and title
     plt.xlabel("Number of nodes")
     plt.ylabel(f"Meantime[{unit}]")
     plt.title(f"{session_name} mean time")
 
-    # Show legend
-    plt.legend()
+    plt.xticks(nodes)
 
-    plt.savefig(save_path)
+    plt.legend(bbox_to_anchor=(1.05, 1), loc="upper left")
+
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+    plt.savefig(save_path, bbox_inches="tight")
+
+    plt.clf()
+
+    return save_path
 
 
-def plot_std_dev_nodes_number(session_name, nodes, std_dev, unit):
+def plot_std_dev_nodes_number(session_name, nodes, std_dev, unit, batchId):
 
     current_datetime = datetime.now()
     filename = (
@@ -192,29 +170,34 @@ def plot_std_dev_nodes_number(session_name, nodes, std_dev, unit):
         + "_"
         + "standard_deviation"
         + "_"
-        + current_datetime.strftime("%Y-%m-%d_%H:%M:%S")
+        + current_datetime.strftime("%Y-%m-%d_%H-%M-%S")
     )
     save_path = utils.escape_chars(
         f"{cfg['dbPath']}\{'images'}\{session_name}\{filename}"
     )
 
-    plt.plot(
-        nodes,
-        std_dev,
-        "o",
-        label="Standard Deviation as functions of number of nodes",
-    )
+    nodes = [int(node) for node in nodes]
 
-    # Draw line connecting points
+    plt.plot(nodes, std_dev, "o", label="Std Deviation")
+
+    for i, txt in enumerate(batchId):
+        plt.annotate(txt, (nodes[i], std_dev[i]))
+
     plt.plot(nodes, std_dev, "b-", alpha=0.3)
 
     plt.xlabel("Number of Nodes")
     plt.ylabel(f"Standard Deviation [{unit}]")
     plt.title(f"{session_name} standard deviation")
 
-    plt.legend()
+    plt.xticks(nodes)
 
-    plt.savefig(save_path)
+    plt.legend(bbox_to_anchor=(1.05, 1), loc="upper left")
+
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+    plt.savefig(save_path, bbox_inches="tight")
+
+    plt.clf()
 
     return save_path
 
@@ -223,18 +206,19 @@ def analyse_session(session_id, session_name):
     db_adapter.session_results.reset_session_results(session_id)
 
     session_batches = db_adapter.analysis.get_session_batches(session_id)
-    number_of_nodes = [batch["number_of_nodes"] for batch in session_batches]
+    batchId = [batch["batch_id"] for batch in session_batches]
+    number_of_nodes = [int(batch["batch_number_of_nodes"]) for batch in session_batches]
     meantimes = [batch["batch_mean_time"] for batch in session_batches]
     std_dev = [batch["batch_std_deviation"] for batch in session_batches]
 
-    cmean_times, unit = convert_times(meantimes)
-    cstd_dev, unit = convert_times(std_dev)
+    cmean_times, unit = meantimes, "s"
+    cstd_dev, unit = std_dev, "s"
 
     meantimePlot = plot_meantime_nodes_number(
-        session_name, number_of_nodes, cmean_times, unit
+        session_name, number_of_nodes, cmean_times, unit, batchId
     )
     stddevPlot = plot_std_dev_nodes_number(
-        session_name, number_of_nodes, cstd_dev, unit
+        session_name, number_of_nodes, cstd_dev, unit, batchId
     )
 
     db_adapter.session_results.insert_session_result(

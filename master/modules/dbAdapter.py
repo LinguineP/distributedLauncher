@@ -366,14 +366,14 @@ class SQLiteDBAdapter:
             self.adapter = adapter
 
         def insert_batch_result(
-            self, batch_id, standard_deviation, mean_execution_time, path_to_graph, unit
+            self, batch_id, standard_deviation, mean_execution_time, path_to_graph
         ):
             try:
                 with sqlite3.connect(self.adapter.db_path) as conn:
                     cursor = conn.cursor()
                     cursor.execute(
                         """
-                        INSERT INTO batch_result (batch_id, standard_deviation, mean_execution_time, path_to_graph,unit)
+                        INSERT INTO batch_result (batch_id, standard_deviation, mean_execution_time, path_to_graph)
                         VALUES (?, ?, ?, ?)
                     """,
                         (
@@ -381,7 +381,6 @@ class SQLiteDBAdapter:
                             standard_deviation,
                             mean_execution_time,
                             path_to_graph,
-                            unit,
                         ),
                     )
                     conn.commit()

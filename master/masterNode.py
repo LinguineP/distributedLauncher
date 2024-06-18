@@ -226,8 +226,6 @@ def doAnalasys():
 @app.route("/api/exportCSV", methods=["POST"])
 def exportCSV():
 
-    data = request.get_json()
-
     dataAnalasys.generate_csv_from_combined_data()
 
     return "Success", 200
