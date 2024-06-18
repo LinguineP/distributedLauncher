@@ -171,8 +171,6 @@ class SQLiteDBAdapter:
                     key_id INTEGER PRIMARY KEY AUTOINCREMENT,
                     key_name VARCHAR(255) UNIQUE NOT NULL,
                     value VARCHAR(255) NOT NULL,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
                 """
             )
@@ -515,6 +513,15 @@ class SQLiteDBAdapter:
                         JOIN batches b ON s.session_id = b.session_id
                         JOIN runs r ON b.batch_id = r.batch_id
                         JOIN node_data nd ON r.run_id = nd.run_id
+                        JOIN (
+                            SELECT
+                                run_id,
+                                MAX(execution_time) AS max_execution_time
+                            FROM
+                                node_data
+                            GROUP BY
+                                run_id
+                        ) nd_max ON nd.run_id = nd_max.run_id AND nd.execution_time = nd_max.max_execution_time
                     ORDER BY
                         s.session_name, b.number_of_nodes, r.run_number;
                     """
@@ -528,12 +535,16 @@ class SQLiteDBAdapter:
                 cursor = conn.cursor()
                 cursor.execute(
                     """
-                    SELECT batches.batch_id,batches.param_used, GROUP_CONCAT(node_data.execution_time) as batch_times
+                    SELECT batches.batch_id, batches.param_used, GROUP_CONCAT(max_execution_times.max_execution_time) as batch_times
                     FROM batches
                     LEFT JOIN runs ON batches.batch_id = runs.batch_id
-                    LEFT JOIN node_data ON runs.run_id = node_data.run_id
+                    LEFT JOIN (
+                        SELECT run_id, MAX(execution_time) AS max_execution_time
+                        FROM node_data
+                        GROUP BY run_id
+                    ) max_execution_times ON runs.run_id = max_execution_times.run_id
                     WHERE batches.session_id = ?
-                    GROUP BY batches.batch_id
+                    GROUP BY batches.batch_id, batches.param_used
                     """,
                     (session_id,),
                 )

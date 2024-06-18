@@ -148,8 +148,8 @@ def analyse_session_batches(session_id, session_name):
         )
         db_adapter.batch_results.insert_batch_result(
             batch["batch_id"],
-            convert_to_seconds(std_deviation),
-            convert_to_seconds(mean),
+            convert_to_seconds(std_deviation, unit),
+            convert_to_seconds(mean, unit),
             graph_path,
         )
 
