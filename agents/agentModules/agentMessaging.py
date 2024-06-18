@@ -16,6 +16,7 @@ commPort = 55002
 resultsPort = 55003
 masterIp = ""
 agentIp = ""
+agentHostName = ""
 
 
 def get_local_ip():
@@ -34,10 +35,11 @@ def get_local_ip():
 
 
 def receive_ip_from_multicast():
-    global masterIp, agentIp, multicastGroup
+    global masterIp, agentIp, agentHostName, multicastGroup
 
     # store for agents ip
     agentIp = get_local_ip()
+    agentHostName = socket.gethostname()
 
     multicast_recv_socket = multicastSetup.MulticastSocket(
         multicastGroup, multicastPort
@@ -112,7 +114,12 @@ def receive_json(socket):
 
 
 def sendResults(runOutput, runTime):
-    results_msg = {"runOutput": runOutput, "runTime": runTime}
+    results_msg = {
+        "runOutput": runOutput,
+        "runTime": runTime,
+        "ip": agentIp,
+        "hostname": agentHostName,
+    }
     send_json(masterIp, resultsPort, results_msg)
 
 
@@ -122,6 +129,6 @@ def send_hello():
         "message": cfg["authentication"]["stored_hello_message"],
         "pass": cfg["authentication"]["stored_hello_pass"],
         "ip": agentIp,
-        "hostname": socket.gethostname(),
+        "hostname": agentHostName,
     }
     send_json(masterIp, multicastPort, hello_msg)
