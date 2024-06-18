@@ -37,7 +37,6 @@ class ShellHandler:
             print("shellopen")
 
         self.__setup_venv()
-        # print(self.process.communicate(cmd))
 
     def __setup_venv(self):
         """activates the venv"""
@@ -81,6 +80,20 @@ class ShellHandler:
         output, error = self.process.communicate(command)
         self.close_shell()
         return output, error
+
+    def read_output(self, timeout=None):
+        """Reads messages from the output queue until it is empty and then retuns them"""
+        output = []
+        try:
+            while True:
+                try:
+                    line = self.output_queue.get(timeout=timeout)
+                    output.append(line.strip())
+                except queue.Empty:
+                    break
+        except Exception as e:
+            print(f"Error reading output: {e}")
+        return output
 
     def close_shell(self):
         """
