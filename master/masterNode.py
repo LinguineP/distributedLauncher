@@ -207,10 +207,8 @@ def measuringStatus():
 def startMeasuring():
 
     data = request.get_json()
-    print(data)
-    executionRoutines.startNMeasurements(data)
 
-    print(data_passer.retrieve("status"))
+    executionRoutines.startBatch(data)
 
     return "Success", 200
 

@@ -59,6 +59,7 @@ def hello_processing(hello_message):
     if not authentication_hello(hello_message):
         return False, {}
 
+    # removes message and pass key value pairs from dict
     all(map(hello_message.pop, ["message", "pass"]))
 
     return True, hello_message

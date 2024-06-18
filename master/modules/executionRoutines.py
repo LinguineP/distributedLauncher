@@ -7,6 +7,8 @@ import resultsGathering as rg
 import dbAdapter
 
 
+db_adapter = dbAdapter.SQLiteDBAdapter()
+
 data_passer: dbAdapter.SQLiteDBAdapter.DataPasser = (
     dbAdapter.SQLiteDBAdapter().dataPasser
 )
@@ -17,19 +19,27 @@ portComm = 55002
 
 def startRepetition(params, runNumber):
 
-    # initialize run
-    # startScriptsPreset
+    currentBatchId = data_passer.retrieve("currentBatchId")
 
-    answerTargetNum = len(params["selectedNodes"])
+    runId = db_adapter.runs.create_new_run(currentBatchId, runNumber)
+
+    data_passer.store("repetitionNumber", runNumber)
+
     data_passer.store("answerCounter", 1)
+
+    data_passer.store("currentRunId", runId)
 
     stop_event = threading.Event()
 
     message_queue = Queue()
 
+    startScriptsPreset(params, measure=True)
+
+    numberOfNodes = data_passer.retrieve("numberOfNodes")
+
     listener_thread = threading.Thread(
         target=rg.results_listener,
-        args=(msg.masterIp, msg.portComm, answerTargetNum, stop_event, message_queue),
+        args=(msg.masterIp, msg.portComm, numberOfNodes, stop_event, message_queue),
     )
     listener_thread.start()
 
@@ -39,39 +49,42 @@ def startRepetition(params, runNumber):
     processor_thread.start()
 
     # while number of incoming messages is < number of nodes being started do some polling to check
-    # print this number of nodes
-    # when it is okay stop
-    print("waiting")
-    while answerTargetNum > int(data_passer.retrieve("answerCounter")):
+    while numberOfNodes > int(data_passer.retrieve("answerCounter")):
         time.sleep(0.2)
 
     stop_event.set()
     listener_thread.join()
     processor_thread.join()
-    print("stoped waiting")
 
 
-def startNMeasurements(params):
+def startBatch(params):
 
     # initialize batch
     # store it
+    numberOfNodes = len(params["selectedNodes"])
+
+    currentBatchId = db_adapter.batches.create_new_batch(
+        params["sessionId"], params["selectedParams"], numberOfNodes
+    )
+
+    data_passer.store("numberOfNodes", numberOfNodes)
+
+    data_passer.store("currentBatchId", currentBatchId)
 
     data_passer.store("status", "measuring")
 
     numberOfReps = params["repetitionsNumber"]
 
     for repetition in range(1, numberOfReps + 1):
+        # starts a single measurment run
         startRepetition(params, repetition)
-        data_passer.store("repetitionNumber", repetition)
-
-        # send end listening signal
 
     data_passer.store("status", "idle")
 
     return
 
 
-def startScriptsPreset(params):
+def startScriptsPreset(params, measure=False):
 
     selectedNodes = params["selectedNodes"]
     selectedScript = params["selectedScript"]
@@ -102,7 +115,7 @@ def startScriptsPreset(params):
             nodeId += 1
             continue  # skips the node that was already started
         nodeParams = utils.replace_node_id(selectedParams, nodeId)
-        msg.send_start_set_params(node["ip"], selectedScript, nodeParams)
+        msg.send_start_set_params(node["ip"], selectedScript, nodeParams, measure)
         nodeId += 1
 
     return "Scripts started successfully"

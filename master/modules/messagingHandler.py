@@ -79,8 +79,13 @@ def receive_json(socket):
     return json_data
 
 
-def send_start_set_params(dest_ip, script, params):
-    message = {"message": "start_node_params", "script": script, "params": params}
+def send_start_set_params(dest_ip, script, params, measure):
+    message = {
+        "message": "start_node_params",
+        "script": script,
+        "params": params,
+        "measure": measure,
+    }
     print("here" + str(message))
     # send_json(dest_ip, portComm, message)  #TODO:uncomment this
 
