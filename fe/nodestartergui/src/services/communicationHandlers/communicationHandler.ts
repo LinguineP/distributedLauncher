@@ -175,6 +175,25 @@ class CommunicationHandler {
       throw error;
     }
   };
+
+  //--------analysis-----------------------
+  exportCsv = async () => {
+    try {
+      await axios.post("/api/exportCSV");
+    } catch (error) {
+      console.error("Error starting data processing:", error);
+      throw error;
+    }
+  };
+
+  doAnalysis = async (data) => {
+    try {
+      await axios.post("/api/doAnalasys", data);
+    } catch (error) {
+      console.error("Error starting data processing:", error);
+      throw error;
+    }
+  };
 }
 
 export default CommunicationHandler;

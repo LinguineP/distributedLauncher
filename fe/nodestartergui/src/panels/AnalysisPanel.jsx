@@ -101,6 +101,39 @@ function AnalysisPanel() {
         setSelectedSession(findSession(value));
     };
 
+    const doAnalysis=() => {
+        const sendCommand=async () => {
+            try {
+
+                await requestHandler.doAnalysis(selectedSession);
+
+            } 
+            catch (error) {
+            console.error('Error exporting csv:', error);
+            }
+        }
+
+        sendCommand()
+
+    }
+
+
+    const exportCsv= () =>{
+
+        const sendCommand=async () => {
+            try {
+
+                await requestHandler.exportCsv();
+
+            } 
+            catch (error) {
+            console.error('Error exporting csv:', error);
+            }
+        }
+
+        sendCommand()
+    }
+
 
 
 
@@ -143,12 +176,12 @@ return (
                         <div className="selectionOutline">
                             <div className="altHalfDiv">
                                 <div className='buttonContainer'>
-                                <button ><p className='Button-text'>Analyse data</p></button>
+                                <button onClick={doAnalysis} ><p className='Button-text'>Analyse data</p></button>
                                 </div>
                             </div>
                             <div className="altHalfDiv">
                                 <div className='buttonContainer'>
-                                <button ><p className='Button-text'>Export CSV</p></button>
+                                <button onClick={exportCsv} ><p className='Button-text'>Export CSV</p></button>
                                 </div>
                             </div>
                         </div>
