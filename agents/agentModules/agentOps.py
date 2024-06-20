@@ -18,9 +18,14 @@ def run_script(script_cmd: str, measure=False):
 
     print(error)
     print(output)
+    returnText="sucess"
+    if(error):
+        returnText="error"
+        
 
     if measure:
-        msg.sendResults(output, execution_time)
+
+        msg.sendResults(returnText, execution_time)
 
     print("\n------------------------------------------------------------\n\n")
 

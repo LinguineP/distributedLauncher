@@ -1,14 +1,10 @@
 import json
 import socket
+import random
+import time
 from agentConfig import *
 import socket
 import multicastSetup
-
-multicastGroup = "239.255.0.0"
-portMulticast = 55001  # not a known port number
-portComm = 55002
-masterIp = ""
-
 
 multicastGroup = "239.255.10.1"  # viewRFC2365
 multicastPort = 55001  # not a known port number
@@ -17,6 +13,10 @@ resultsPort = 55003
 masterIp = ""
 agentIp = ""
 agentHostName = ""
+
+
+def generate_offset():
+    return random.uniform(0, 1)
 
 
 def get_local_ip():
@@ -68,6 +68,8 @@ def send_json(dest_ip, dest_port, data_dict):
 
     # Connect to the server
     print(dest_ip, dest_port)
+    time.sleep(generate_offset())
+
     client_socket.connect((dest_ip, dest_port))
     print("Connected to server.")
 
