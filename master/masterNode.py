@@ -169,7 +169,7 @@ def createSession():
 def readSessions():
     """
     @brief: get a list of sessions
-    @return: json containing list of cmd params as a value for cmdParamsList key
+    @return: json containing list of sessions
     """
 
     sessionList = db_adapter.sessions.get_all_sessions()
@@ -177,16 +177,28 @@ def readSessions():
     return jsonify(sessionList)
 
 
-@app.route("/api/sessions/batchParams", methods=["GET"])
-def readBatchParams():
+@app.route("/api/sessions/sessionResults", methods=["GET"])
+def readSessionResults():
     """
     @brief: get a list of sessions
+    @return: json containing list of sessions
+    """
+
+    sessionList = db_adapter.session_results.get_session_result_paths()
+
+    return jsonify(sessionList)
+
+
+@app.route("/api/sessions/batchResults", methods=["GET"])
+def readBatchResults():
+    """
+    @brief: get a list of batches with params , id and results
     @return: json containing list of cmd params as a value for cmdParamsList key
     """
     # TODO:implement getting batch params
-    sessionList = db_adapter.sessions.get_all_sessions()
+    batchResults = db_adapter.batch_results.get_batch_results_for_session()
 
-    return jsonify(sessionList)
+    return jsonify(batchResults)
 
 
 @app.route("/api/measuringStatus", methods=["GET"])

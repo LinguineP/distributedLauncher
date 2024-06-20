@@ -1,6 +1,8 @@
 import socket
 import json
 import dbAdapter
+import time
+from config import cfg
 
 
 data_passer: dbAdapter.SQLiteDBAdapter.DataPasser = (
@@ -37,7 +39,7 @@ def send_ip_to_multicast():
     data_passer.store("masterIp", masterIp)
     message = masterIp.encode("utf-8")
     multicast_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    multicast_socket.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 1)
+    multicast_socket.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, cfg["TTL"])
 
     multicast_socket.sendto(message, (multicastGroup, portMulticast))
     multicast_socket.close()
@@ -90,14 +92,19 @@ def send_start_set_params(dest_ip, script, params, measure):
     send_json(dest_ip, portComm, message)  # TODO:uncomment this
 
 
-def send_json(dest_ip, dest_port, data_dict):
-
+def send_json(dest_ip, dest_port, data_dict, delay=1):
     json_data = json.dumps(data_dict)
 
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:
-        client_socket.connect((dest_ip, dest_port))
-        client_socket.sendall(json_data.encode("utf-8"))
-        print("JSON data sent successfully.")
-    finally:
-        client_socket.close()
+    while True:
+        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            client_socket.connect((dest_ip, dest_port))
+            client_socket.sendall(json_data.encode("utf-8"))
+            print("JSON data sent successfully.")
+            return  # Exit the function after a successful send
+        except ConnectionRefusedError as e:
+            print(f"Connection to {dest_ip}:{dest_port} refused: {e}")
+            print(f"Retrying in {delay} seconds...")
+            time.sleep(delay)  # Wait for the specified delay before retrying
+        finally:
+            client_socket.close()

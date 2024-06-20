@@ -104,18 +104,23 @@ def startScriptsPreset(params, measure=False):
     paramsAsList = selectedParams.split(" ")
     NumberOfNodes = paramsAsList[0]
     firstNodeId = 0
+    firstNodeIp = ""
     if paramsAsList[2] != "mip":
-        firstNodeId = paramsAsList[2]
+        firstNodeId = int(paramsAsList[2])
         nodeParams = utils.replace_node_id(selectedParams, firstNodeId)
         msg.send_start_set_params(masterIp, selectedScript, nodeParams, measure)
+        time.sleep(0.5)
     nodeId = 0
     # iterates over selected nodes this is ok because it allows for some nodes to be manualy started
     for node in selectedNodes:
-        if nodeId == int(firstNodeId):
-            nodeId += 1
+        if nodeId == firstNodeId:
+            nodeId += 1  # skips the node number of the node that was first started
+        if node["ip"] == masterIp:
+            print("first node", node)
             continue  # skips the node that was already started
         nodeParams = utils.replace_node_id(selectedParams, nodeId)
         msg.send_start_set_params(node["ip"], selectedScript, nodeParams, measure)
+        time.sleep(0.2)
         nodeId += 1
 
     return "Scripts started successfully"

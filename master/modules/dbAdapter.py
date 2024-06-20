@@ -481,13 +481,22 @@ class SQLiteDBAdapter:
                     result = cursor.fetchone()
                     if result:
                         result_path_mean, result_path_std_dev = result
-                        return result_path_mean, result_path_std_dev
+                        return {
+                            "meanResult": result_path_mean,
+                            "stdDevResult": result_path_std_dev,
+                        }
                     else:
                         print("No result found for session ID:", session_id)
-                        return None, None
+                        return {
+                            "meanResult": "Empty",
+                            "stdDevResult": "Empty",
+                        }
             except sqlite3.Error as e:
                 print("Error occurred:", e)
-                return None, None
+                return {
+                    "meanResult": "Empty",
+                    "stdDevResult": "Empty",
+                }
 
     class Analysis:
 
