@@ -4,7 +4,7 @@ import threading
 import utils
 import messagingHandler as msg
 import resultsGathering as rg
-from modules import dataAnalasys as da
+import dataAnalysis as da
 import dbAdapter
 
 
@@ -95,48 +95,50 @@ def generateCSV():
 
 
 def startScriptsPreset(params, measure=False):
+    try:
+        selectedNodes = params["selectedNodes"]
+        selectedScript = params["selectedScript"]
+        masterIp = params["masterNodeIp"]
 
-    selectedNodes = params["selectedNodes"]
-    selectedScript = params["selectedScript"]
-    masterIp = params["masterNodeIp"]
+        paramsAsList = params["selectedParams"].split(" ")
 
-    paramsAsList = params["selectedParams"].split(" ")
+        mipFlag = paramsAsList[2] == "mip"
 
-    mipFlag = paramsAsList[2] == "mip"
+        stringTransforms = [
+            (utils.remove_double_space, "  "),
+            (utils.replace_mip, masterIp),
+        ]
 
-    stringTransforms = [
-        (utils.remove_double_space, "  "),
-        (utils.replace_mip, masterIp),
-    ]
+        selectedParams = utils.string_transformer(
+            params["selectedParams"], stringTransforms
+        )
 
-    selectedParams = utils.string_transformer(
-        params["selectedParams"], stringTransforms
-    )
+        print(selectedParams)
+        paramsAsList = selectedParams.split(" ")
+        NumberOfNodes = paramsAsList[0]
+        firstNodeId = 0
+        firstNodeIp = ""
+        if mipFlag:
+            firstNodeId = int(paramsAsList[2])
+        nodeParams = utils.replace_node_id(selectedParams, firstNodeId)
+        msg.send_start_set_params(masterIp, selectedScript, nodeParams, measure)
+        time.sleep(0.5)
+        nodeId = 0
+        # iterates over selected nodes this is ok because it allows for some nodes to be manualy started
+        for node in selectedNodes:
+            if nodeId == firstNodeId:
+                nodeId += 1  # skips the node number of the node that was first started
+            if node["ip"] == masterIp:
+                print("first node", node)
+                continue  # skips the node that was already started
+            nodeParams = utils.replace_node_id(selectedParams, nodeId)
+            msg.send_start_set_params(node["ip"], selectedScript, nodeParams, measure)
+            time.sleep(0.2)
+            nodeId += 1
 
-    print(selectedParams)
-    paramsAsList = selectedParams.split(" ")
-    NumberOfNodes = paramsAsList[0]
-    firstNodeId = 0
-    firstNodeIp = ""
-    if mipFlag:
-        firstNodeId = int(paramsAsList[2])
-    nodeParams = utils.replace_node_id(selectedParams, firstNodeId)
-    msg.send_start_set_params(masterIp, selectedScript, nodeParams, measure)
-    time.sleep(0.5)
-    nodeId = 0
-    # iterates over selected nodes this is ok because it allows for some nodes to be manualy started
-    for node in selectedNodes:
-        if nodeId == firstNodeId:
-            nodeId += 1  # skips the node number of the node that was first started
-        if node["ip"] == masterIp:
-            print("first node", node)
-            continue  # skips the node that was already started
-        nodeParams = utils.replace_node_id(selectedParams, nodeId)
-        msg.send_start_set_params(node["ip"], selectedScript, nodeParams, measure)
-        time.sleep(0.2)
-        nodeId += 1
-
-    return "Scripts started successfully"
+        return False, "Scripts started successfully"
+    except:
+        return True, "An error occured please check params and server logs if possible"
 
 
 def shutdownAgentsGracefully(nodesAlive):

@@ -70,7 +70,7 @@ def get_session_results(session_id):
 
 
 def get_session_batch_results(session_id):
-    db_adapter.batch_results.get_batch_results_for_session(session_id)
+    return db_adapter.batch_results.get_batch_results_for_session(session_id)
 
 
 def check_measurement_status_exists():

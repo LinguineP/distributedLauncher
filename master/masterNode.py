@@ -70,8 +70,8 @@ def startMeasuring():
     return "Success", 200
 
 
-@app.route("/api/doAnalasys", methods=["POST"])
-def doAnalasys():
+@app.route("/api/doAnalysis", methods=["POST"])
+def doAnalysis():
 
     data = request.get_json()
 
@@ -253,7 +253,7 @@ def measuringStatus():
 @app.route("/api/imagePng/<path:filename>")
 def serve_image(filename):
 
-    filename = change_slashes(filename + ".png")
+    filename = change_slashes(filename)
 
     if os.path.isfile(filename):
         return send_file(filename, mimetype="image/jpeg")
