@@ -4,7 +4,7 @@ import AvailableNodesList from '../components/runnablenodeList/AvailableNodesLis
 import SelectedNodesList from '../components/runnablenodeList/SelectedNodesListComponent.jsx';
 import AvailableScriptsList from '../components/availableScriptsList/AvailableScriptsListComponent.jsx';
 import CommandParamsList from '../components/paramsList/CommandParamsList.jsx';
-import CommunicationHandler from '../services/communicationHandlers/communicationHandler.ts';
+import CommunicationHandler from '../services/communicationHandler.ts';
 import DataVault from '../services/dataVault.ts'
 
 function LauncherPanel() {
@@ -167,7 +167,7 @@ function LauncherPanel() {
                     <div className="selectionOutline">
                       <div className="altHalfDiv">
                         <div className='buttonContainer'>
-                          <button onClick={startRemote}><p className='Button-text'>Start Scripts</p></button>
+                          <button onClick={startRemote}><p className='Button-text'>Launch</p></button>
                         </div>
                       </div>
                       <div className="altHalfDiv">

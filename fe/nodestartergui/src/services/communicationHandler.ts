@@ -1,9 +1,10 @@
 import axios from "axios";
-import DataVault from "../dataVault.ts";
+import DataVault from "./dataVault.ts";
 
 class CommunicationHandler {
   private paramsUrl: string = "/api/cmdParams";
   private sessionUrl: string = "/api/sessions";
+  private imagePngUrl: string = "/api/imagePng";
 
   stopScan() {
     return axios
@@ -32,7 +33,6 @@ class CommunicationHandler {
     const data = {
       startParams: startParams,
     };
-
     axios
       .post("api/startNodes", data)
       .then(function (response) {
@@ -188,12 +188,49 @@ class CommunicationHandler {
 
   doAnalysis = async (data) => {
     try {
-      await axios.post("/api/doAnalasys", data);
+      await axios.post("/api/doAnalysis", data);
     } catch (error) {
       console.error("Error starting data processing:", error);
       throw error;
     }
   };
+  //--------------------image fetch------------
+  async fetchImage(imagePath: string) {
+    const encodedPath = imagePath; // Encode the path for URL
+    try {
+      const response = await axios.get(`${this.imagePngUrl}/${encodedPath}`, {
+        responseType: "blob",
+      });
+      return URL.createObjectURL(response.data);
+    } catch (error) {
+      console.error("Error fetching the image:", error);
+      throw error;
+    }
+  }
+
+  async getSessionResults(sessionId: string): Promise<any> {
+    try {
+      const response = await axios.get(`/api/sessions/sessionResults`, {
+        params: { sessionId },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("GET Session Results Error:", error);
+      throw error;
+    }
+  }
+
+  async getBatchResults(sessionId: string) {
+    try {
+      const response = await axios.get(`/api/sessions/batchResults`, {
+        params: { sessionId },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("GET Batch Results Error:", error);
+      throw error;
+    }
+  }
 }
 
 export default CommunicationHandler;

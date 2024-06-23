@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../../App.css'
 import './CommandParamsList.css';
-import CommunicationHandler from '../../services/communicationHandlers/communicationHandler.ts';
+import CommunicationHandler from '../../services/communicationHandler.ts';
 
 const CommandParamsList = ({ paramsList ,itemClicked} ) => {
     const [items, setItems] = useState([]);

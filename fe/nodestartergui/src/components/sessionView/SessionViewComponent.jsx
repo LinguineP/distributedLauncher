@@ -6,7 +6,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import CommandParamsList from '../paramsList/CommandParamsList';
 import DataVault from '../../services/dataVault.ts';
 import NumberInput from '../numberInput/numberInputComponent';
-import CommunicationHandler from './../../services/communicationHandlers/communicationHandler.ts';
+import CommunicationHandler from './../../services/communicationHandler.ts';
 import AvailableNodesList from './../runnablenodeList/AvailableNodesListComponent';
 import SelectedNodesList from './../runnablenodeList/SelectedNodesListComponent';
 import ProgressBar from '../progressBar/ProgressBar.jsx';

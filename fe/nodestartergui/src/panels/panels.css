@@ -280,3 +280,62 @@
     margin-left: 20px;
     margin-right: 20px;
 }
+
+.altThirdDiv {
+    margin: 10px;
+    padding: 10px;
+    width: 30%;
+    height: 100%;
+    display: block;
+    border-radius: 10px;
+}
+
+.thirdButtonContainer {
+    margin: 10px;
+    display: flex;
+    justify-content: center;
+    border-radius: 10px;
+}
+
+.Button-text {
+    white-space: nowrap;
+    
+}
+
+.thirdButtonContainer button {
+    border-radius: 10px;
+}
+
+.altHalfDivImage {
+    margin: 5px;
+    padding: 2px;
+    width: 50%;
+    height: 100%;
+    display: block;
+}
+
+
+.notification {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    color: white;
+    text-align: center;
+    width: 80%;
+    max-width: 400px;
+}
+
+.notification.success {
+    background-color: #66aa69;
+    
+}
+
+.notification.error {
+    background-color: #e9564b;
+    
+}

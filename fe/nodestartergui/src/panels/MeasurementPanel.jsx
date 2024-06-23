@@ -6,7 +6,7 @@ import SessionView from '../components/sessionView/SessionViewComponent.jsx';
 import DropdownMenu from '../components/dropdownMenu/DropdownMenuComponent.jsx';
 import AvailableScriptsList from '../components/availableScriptsList/AvailableScriptsListComponent.jsx';
 import DataVault from '../services/dataVault.ts'
-import CommunicationHandler from '../services/communicationHandlers/communicationHandler.ts';
+import CommunicationHandler from '../services/communicationHandler.ts';
 
 Modal.setAppElement('#root'); 
 

@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
 import './expandableList.css'
+import ImageDisplay from '../imageDisplay/ImageDisplay';
 
-const ExpandableList = () => {
-  const items = [
-    { id: 1, title: 'Item 1', content: 'Content for Item 1' },
-    { id: 2, title: 'Item 2', content: 'Content for Item 2' },
-    { id: 3, title: 'Item 3', content: 'Content for Item 3' },
-  ];
+const ExpandableList = ({items}) => {
+  
 
   const [expandedItems, setExpandedItems] = useState([]);
 
@@ -21,29 +18,39 @@ const ExpandableList = () => {
   return (
     <div className="expandable-list">
       {items.map(item => (
-        
-        <div key={item.id} className="expandable-item">
-          <div 
-            onClick={() => toggleItem(item.id)} 
-            className="expandable-header"
-          >
+        <div key={item.batch_id} className="expandable-item">
+          <div onClick={() => toggleItem(item.batch_id)} className="expandable-header">
             <span className="arrow">
-              {expandedItems.includes(item.id) ? '▼' : '▶'}
+              {expandedItems.includes(item.batch_id) ? '▼' : '▶'}
             </span>
             <span className="title">
-              {item.title}
+              {"batch id: "} {item.batch_id}{", batch params: "}{item.param_used}
             </span>
           </div>
-          {expandedItems.includes(item.id) && (
+          {expandedItems.includes(item.batch_id) && (
             <div className="expandable-content">
-              <p>{item.content}</p>
+              <div className="table-container">
+                <table className="table">
+                  <tbody>
+                    <tr>
+                      <td>{"mean execution time: "}</td>
+                      <td>{item.mean_execution_time}</td>
+                    </tr>
+                    <tr>
+                      <td>{"standard deviation: "}</td>
+                      <td>{item.standard_deviation}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <ImageDisplay imagePath={item.path_to_graph} />
             </div>
           )}
         </div>
-        
       ))}
     </div>
   );
+
 };
 
 export default ExpandableList;
