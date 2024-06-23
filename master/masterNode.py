@@ -1,19 +1,13 @@
-from flask import Flask, render_template, jsonify, request
+import os
+from flask import Flask, abort, render_template, jsonify, request, send_file
 import multiprocessing as mp
 from modules import asyncBeaconRoutines as asyncBeacon
-from modules import dataProcessing
 from modules import executionRoutines
-from modules import dbAdapter
-from modules import dataAnalasys
+from modules import dataHandler
+from modules.utils import change_slashes
 
 
 app = Flask(__name__, static_folder="static/static", template_folder="static")
-
-db_adapter = dbAdapter.SQLiteDBAdapter()
-
-data_passer: dbAdapter.SQLiteDBAdapter.DataPasser = (
-    dbAdapter.SQLiteDBAdapter().dataPasser
-)
 
 
 masterIp = ""
@@ -26,7 +20,6 @@ def stopScan():
     if beacon.is_alive():
         asyncBeacon.stop_beacon(stop_event=stop_event)
         nodesAlive = parent_end.recv()
-        availableScripts: list = dataProcessing.getAvailableScripts()
         response = {
             "message": "Worker stopped.",
             "availableNodes": nodesAlive,
@@ -67,6 +60,34 @@ def shudownAgents():
     return "Success", 200
 
 
+@app.route("/api/startMeasuring", methods=["POST"])
+def startMeasuring():
+
+    data = request.get_json()
+
+    executionRoutines.startBatch(data)
+
+    return "Success", 200
+
+
+@app.route("/api/doAnalasys", methods=["POST"])
+def doAnalasys():
+
+    data = request.get_json()
+
+    executionRoutines.doAnalysis(data)
+
+    return "Success", 200
+
+
+@app.route("/api/exportCSV", methods=["POST"])
+def exportCSV():
+
+    executionRoutines.generateCSV()
+
+    return "Success", 200
+
+
 @app.route("/api/cmdParams", methods=["POST"])
 def createCommandParam():
     """
@@ -74,11 +95,11 @@ def createCommandParam():
     """
     try:
 
-        new_param = request.get_json()
-        if not new_param or "value" not in new_param:
+        data = request.get_json()
+        if not data or "value" not in data:
             return jsonify({"error": "Invalid input"}), 400
-        print(new_param)
-        ret = db_adapter.params.insert_setting(new_param["value"])
+
+        ret = dataHandler.insert_params_setting(data)
 
         return jsonify({"paramsList": [ret]}), 201
 
@@ -93,8 +114,8 @@ def readCommandParams():
     @return: json containing list of cmd params as a value for cmdParamsList key
     """
 
-    params_list = db_adapter.params.get_all_settings()
-    availableScripts: list = dataProcessing.getAvailableScripts()
+    params_list = dataHandler.get_params_settings()
+    availableScripts: list = dataHandler.getAvailableScripts()
 
     return jsonify({"paramsList": params_list, "availableScripts": availableScripts})
 
@@ -108,13 +129,13 @@ def updateCommandParams(item_id):
     """
     try:
         # Parse the incoming JSON request body
-        updated_param = request.get_json()
-        if not updated_param or "value" not in updated_param:
+        data = request.get_json()
+        if not data or "value" not in data:
             return jsonify({"error": "Invalid input"}), 400
 
         # Find the item by ID and update it
-        if db_adapter.params.update_setting(item_id, updated_param["value"]):
-            return jsonify(updated_param), 200
+        if dataHandler.update_param(item_id, data):
+            return jsonify(data), 200
 
         return jsonify({"error": "Item not found"}), 404
 
@@ -132,8 +153,9 @@ def deleteCommandParam(item_id):
 
     try:
 
-        if db_adapter.params.delete_setting(item_id):
+        if dataHandler.delete_param(item_id):
             return jsonify({"message": "Item deleted"}), 200
+
         return jsonify({"error": "Item not found"}), 404
 
     except Exception as e:
@@ -147,17 +169,15 @@ def createSession():
     """
     try:
 
-        new_param = request.get_json()
+        new_session = request.get_json()
         if (
-            not new_param
-            or "sessionName" not in new_param
-            or "sessionScript" not in new_param
+            not new_session
+            or "sessionName" not in new_session
+            or "sessionScript" not in new_session
         ):
             return jsonify({"error": "Invalid input"}), 400
-        print(new_param)
-        ret = db_adapter.sessions.insert_session(
-            new_param["sessionName"], new_param["sessionScript"]
-        )
+
+        ret = dataHandler.insert_session(new_session)
 
         return jsonify([ret]), 201
 
@@ -172,7 +192,7 @@ def readSessions():
     @return: json containing list of sessions
     """
 
-    sessionList = db_adapter.sessions.get_all_sessions()
+    sessionList = dataHandler.get_all_sesisions()
 
     return jsonify(sessionList)
 
@@ -180,34 +200,49 @@ def readSessions():
 @app.route("/api/sessions/sessionResults", methods=["GET"])
 def readSessionResults():
     """
-    @brief: get a list of sessions
-    @return: json containing list of sessions
+    @brief: get session results for a given session ID
+    @return: json containing session results
     """
+    session_id = request.args.get("sessionId")
+    if not session_id:
+        return jsonify({"error": "Missing sessionId parameter"}), 400
 
-    sessionList = db_adapter.session_results.get_session_result_paths()
+    try:
+        sessionList = dataHandler.get_session_results(session_id)
 
-    return jsonify(sessionList)
+        return jsonify(sessionList)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/api/sessions/batchResults", methods=["GET"])
 def readBatchResults():
     """
-    @brief: get a list of batches with params , id and results
-    @return: json containing list of cmd params as a value for cmdParamsList key
+    @brief: get batch results for a given session ID
+    @return: json containing list of batch results
     """
-    # TODO:implement getting batch params
-    batchResults = db_adapter.batch_results.get_batch_results_for_session()
+    session_id = request.args.get("sessionId")
+    if not session_id:
+        return jsonify({"error": "Missing sessionId parameter"}), 400
 
-    return jsonify(batchResults)
+    try:
+        batchResults = dataHandler.get_session_batch_results(session_id)
+        return jsonify(batchResults)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route("/api/measuringStatus", methods=["GET"])
 def measuringStatus():
 
-    if data_passer.exists("status") and data_passer.exists("repetitionNumber"):
+    if (
+        dataHandler.check_measurement_status_exists()
+        and dataHandler.check_measurement_repetition_number_exists()
+    ):
         status = {
-            "status": data_passer.retrieve("status"),
-            "repetitionNumber": data_passer.retrieve("repetitionNumber"),
+            "status": dataHandler.retrive_measurment_status(),
+            "repetitionNumber": dataHandler.retrive_repetition_number(),
         }
     else:
         status = {"status": "idle", "repetitionNumber": -1}
@@ -215,32 +250,15 @@ def measuringStatus():
     return jsonify(status)
 
 
-@app.route("/api/startMeasuring", methods=["POST"])
-def startMeasuring():
+@app.route("/api/imagePng/<path:filename>")
+def serve_image(filename):
 
-    data = request.get_json()
+    filename = change_slashes(filename + ".png")
 
-    executionRoutines.startBatch(data)
-
-    return "Success", 200
-
-
-@app.route("/api/doAnalasys", methods=["POST"])
-def doAnalasys():
-
-    data = request.get_json()
-
-    dataAnalasys.do_analysis(data["session_id"], data["session_name"])
-
-    return "Success", 200
-
-
-@app.route("/api/exportCSV", methods=["POST"])
-def exportCSV():
-
-    dataAnalasys.generate_csv_from_combined_data()
-
-    return "Success", 200
+    if os.path.isfile(filename):
+        return send_file(filename, mimetype="image/jpeg")
+    else:
+        abort(404, description="Resource not found")
 
 
 @app.route("/")

@@ -1,8 +1,8 @@
 import asyncio
 import time
 import messagingHandler as msg
-from dataProcessing import *
 import dbAdapter
+from config import cfg
 
 db_adapter = dbAdapter.SQLiteDBAdapter()
 
@@ -32,6 +32,40 @@ async def incomingListener(stop_event, pipe_end):
     pipe_end.send(inNodes)
 
 
+def getAvailableScripts():
+    return getAvailableScripts()
+
+
 def stop_beacon(stop_event):
     print("Stopping worker...")
     stop_event.set()
+
+
+def authentication_hello(rcv_message):
+    if (
+        rcv_message["message"] != cfg["authentication"]["stored_hello_message"]
+        or rcv_message["pass"] != cfg["authentication"]["stored_hello_pass"]
+    ):
+        print("Wrong credentials")
+        return False
+    return True
+
+
+def hello_processing(hello_message):
+
+    if not hello_message:
+        return False, {}
+
+    hello_keys = ["hostname", "ip", "message", "pass"]
+
+    if not all(key in hello_message for key in hello_keys):
+        print("Incoming message format not Ok")
+        return False, {}
+
+    if not authentication_hello(hello_message):
+        return False, {}
+
+    # removes message and pass key value pairs from dict
+    all(map(hello_message.pop, ["message", "pass"]))
+
+    return True, hello_message

@@ -1,4 +1,5 @@
 import re
+import sys
 from typing import Callable, List, Tuple
 
 
@@ -17,6 +18,12 @@ def escape_chars(s):
         "\v": "\\v",
     }
     return "".join([escape_dict.get(char, char) for char in s])
+
+
+def change_slashes(path):
+    if sys.platform == "win32":
+        return path.replace("/", "\\")
+    return path
 
 
 def extractIpfromString(inString: str) -> str:

@@ -1,9 +1,10 @@
 import time
 from queue import Queue
-import messagingHandler as msg
-import utils
 import threading
+import utils
+import messagingHandler as msg
 import resultsGathering as rg
+from modules import dataAnalasys as da
 import dbAdapter
 
 
@@ -84,11 +85,24 @@ def startBatch(params):
     return
 
 
+def doAnalysis(params):
+    sessionId, sessionName = params["session_id"], params["session_name"]
+    da.do_analysis(sessionId, sessionName)
+
+
+def generateCSV():
+    da.generate_csv_from_combined_data()
+
+
 def startScriptsPreset(params, measure=False):
 
     selectedNodes = params["selectedNodes"]
     selectedScript = params["selectedScript"]
     masterIp = params["masterNodeIp"]
+
+    paramsAsList = params["selectedParams"].split(" ")
+
+    mipFlag = paramsAsList[2] == "mip"
 
     stringTransforms = [
         (utils.remove_double_space, "  "),
@@ -100,16 +114,15 @@ def startScriptsPreset(params, measure=False):
     )
 
     print(selectedParams)
-
     paramsAsList = selectedParams.split(" ")
     NumberOfNodes = paramsAsList[0]
     firstNodeId = 0
     firstNodeIp = ""
-    if paramsAsList[2] != "mip":
+    if mipFlag:
         firstNodeId = int(paramsAsList[2])
-        nodeParams = utils.replace_node_id(selectedParams, firstNodeId)
-        msg.send_start_set_params(masterIp, selectedScript, nodeParams, measure)
-        time.sleep(0.5)
+    nodeParams = utils.replace_node_id(selectedParams, firstNodeId)
+    msg.send_start_set_params(masterIp, selectedScript, nodeParams, measure)
+    time.sleep(0.5)
     nodeId = 0
     # iterates over selected nodes this is ok because it allows for some nodes to be manualy started
     for node in selectedNodes:
