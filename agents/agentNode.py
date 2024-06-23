@@ -1,6 +1,6 @@
+import sys
 import agentModules.agentMessaging as msg
 import agentModules.agentOps as ops
-import sys
 
 masterIpStore = {}
 masterIpKey = "masterIp"
@@ -16,18 +16,17 @@ def execution():
 
 
 def agentProcess():
-    try:
-        agent_active = True
-        while agent_active:
 
+    agent_active = True
+    while agent_active:
+        try:
             if masterIpKey not in masterIpStore:
                 discovery()
 
             agent_active = execution()
-
-    except KeyboardInterrupt:
-        ops.exit_gracefully()
-        return
+        except KeyboardInterrupt:
+            print("Shutting down the agent...")
+            exit(1)
 
 
 if __name__ == "__main__":
@@ -36,4 +35,8 @@ if __name__ == "__main__":
         print("Error:", sys.platform, "is not supported!")
         exit(0)
     # start the main routine
+    print("\n####################################################")
+    print("\n################### Agent Node #####################")
+    print("\n####################################################\n")
+
     agentProcess()

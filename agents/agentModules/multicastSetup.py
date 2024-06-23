@@ -13,7 +13,7 @@ class MulticastSocket:
     Class to wrap a socket that receives from one or more multicast groups.
     """
 
-    def __init__(self, multicast_ip: str, multicast_port: int):
+    def __init__(self, multicast_ip: str, multicast_port: int, timeout=None):
 
         self.addr_family = socket.AF_INET  # for ipv4 ipv6 not supported
         self.multicast_ip = multicast_ip  # multicast groups ip address
@@ -21,7 +21,7 @@ class MulticastSocket:
 
         self.is_opened = False
 
-        self.timeout = None  # controls the timeout if its none its blocking
+        self.timeout = timeout  # controls the timeout if its none its blocking
 
         self.iface_ips = get_interface_ips(self.addr_family == socket.AF_INET)
 
@@ -110,15 +110,13 @@ class MulticastSocket:
         # Description says: Waits until one or more file descriptors are ready for some kind of I/O.
         # On windows it only works for sockets which is what we need
 
-        print("receiving")
-
         read_list, write_list, exception_list = select.select(
             self.sockets, [], [], self.timeout
         )
 
         if len(read_list) == 0:
             # No data to read
-            return None
+            return None, (None, None)
 
         # Since we only want to return one packet at a time, just pick the first readable socket.
         return cast(

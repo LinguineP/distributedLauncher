@@ -18,10 +18,9 @@ def run_script(script_cmd: str, measure=False):
 
     print(error)
     print(output)
-    returnText="sucess"
-    if(error):
-        returnText="error"
-        
+    returnText = "sucess"
+    if error:
+        returnText = "error"
 
     if measure:
 
@@ -43,12 +42,6 @@ def connect() -> str:
     return masterIp
 
 
-def exit_gracefully():
-    """cleans up before a gracefull exit"""
-
-    print("Shutting down the agent...")
-
-
 def wait_for_instructions():
     """reacts to commands sent to agent from server"""
 
@@ -56,13 +49,12 @@ def wait_for_instructions():
 
     received = msg.receive_command()
     if received["message"] == "start_node_params":
+        print("Starting a node with params: ", received["params"])
         start_node_params(received["script"], received["params"], received["measure"])
         received = None
     elif received["message"] == "shutdown_agent":
-        exit_gracefully()
-        return False
-    elif received["message"] == "alive_ping":
-        pass
+        print("Shutting down the agent...")
+        return False  # this makes the main loop break
     else:
         print("Unknown command")
 

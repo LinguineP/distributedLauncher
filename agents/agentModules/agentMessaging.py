@@ -1,6 +1,7 @@
 import json
 import socket
 import random
+import sys
 import time
 from agentConfig import *
 import socket
@@ -42,19 +43,19 @@ def receive_ip_from_multicast():
     agentHostName = socket.gethostname()
 
     multicast_recv_socket = multicastSetup.MulticastSocket(
-        multicastGroup, multicastPort
+        multicastGroup, multicastPort, 1
     )
-
+    print("Waiting for master node ip...")
     while True:
-        data, source_addr = multicast_recv_socket.recvfrom()
-        if data:
-            masterIp = data.decode("utf-8")
-            print(f"Received IP address: {masterIp}, {source_addr}")
-            return masterIp
-
-
-def master_ping():
-    pass
+        try:
+            data, source_addr = multicast_recv_socket.recvfrom()
+            if data:
+                masterIp = data.decode("utf-8")
+                print(f"Master node IP address: {masterIp}")
+                return masterIp
+        except KeyboardInterrupt:
+            print("\nCtrl+C pressed. Exiting...")
+            exit(1)
 
 
 def send_json(dest_ip, dest_port, data_dict):
@@ -67,15 +68,14 @@ def send_json(dest_ip, dest_port, data_dict):
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     # Connect to the server
-    print(dest_ip, dest_port)
+    print("Destination adress", dest_ip, dest_port)
     time.sleep(generate_offset())
 
     client_socket.connect((dest_ip, dest_port))
-    print("Connected to server.")
 
     # Send the JSON data
     client_socket.sendall(json_data.encode("utf-8"))
-    print("JSON data sent successfully.")
+    print("Message sent.")
 
     client_socket.close()
 
@@ -84,7 +84,8 @@ def receive_command():
     """receives a command in the form of json via tcp"""
 
     agent_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    print(masterIp, commPort)
+    print()
+    print("\nListening for commands from master node", masterIp, commPort)
     agent_socket.bind((agentIp, commPort))
     agent_socket.listen(1)
 
@@ -92,16 +93,16 @@ def receive_command():
         master_socket, master_address = agent_socket.accept()
 
         json_data = receive_json(master_socket)
+        print("Received command", json_data["message"])
 
         return json_data
     except Exception as e:
-        # print("Error:", e)
-        pass
+        print("Error:", e)
     finally:
         agent_socket.close()
 
 
-def receive_json(socket):
+def receive_json(socket: socket.socket):
     """receives a json on a passed socket"""
     data = b""
     while True:
@@ -111,7 +112,6 @@ def receive_json(socket):
         data += chunk
 
     json_data = json.loads(data.decode("utf-8"))
-    print("Received JSON:", json_data)
     return json_data
 
 
@@ -133,4 +133,5 @@ def send_hello():
         "ip": agentIp,
         "hostname": agentHostName,
     }
+    print("\nSending a hello to the master node")
     send_json(masterIp, multicastPort, hello_msg)
