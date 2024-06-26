@@ -55,3 +55,13 @@ def string_transformer(inString: str, transformations: List[Tuple[Callable, str]
     for function, param in transformations:
         inString = function(inString, param)
     return inString
+
+
+def check_centralised(param_string):
+
+    centralised_pattern = r"^\d+\s+id\s+\d+\s+mip(\s+.*)?$"
+
+    if re.match(centralised_pattern, param_string):
+        return True
+    else:
+        return False

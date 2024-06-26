@@ -28,7 +28,9 @@ async def incomingListener(stop_event, pipe_end):
         success, result = hello_processing(msg.receive_discovery())
         if success:
             inNodes.append(result)
+            print("number of discovered nodes", len(inNodes))
             db_adapter.nodes.create_new_node(result["hostname"], result["ip"])
+
     pipe_end.send(inNodes)
 
 

@@ -40,7 +40,6 @@ def send_ip_to_multicast():
     message = masterIp.encode("utf-8")
     multicast_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     multicast_socket.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, cfg["TTL"])
-
     multicast_socket.sendto(message, (multicastGroup, portMulticast))
     multicast_socket.close()
 
@@ -88,7 +87,7 @@ def send_start_set_params(dest_ip, script, params, measure):
         "params": params,
         "measure": measure,
     }
-    print("here" + str(message))
+    print("sent command" + str(message))
     send_json(dest_ip, portComm, message)
 
 
