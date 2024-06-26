@@ -1,5 +1,4 @@
 import sys
-import agentModules.agentMessaging as msg
 import agentModules.agentOps as ops
 
 masterIpStore = {}

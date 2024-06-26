@@ -4,6 +4,12 @@ import agentMessaging as msg
 from shellInteract import *
 
 
+def connect() -> str:
+    masterIp = msg.receive_ip_from_multicast()
+    msg.send_hello()
+    return masterIp
+
+
 def run_script(script_cmd: str, measure=False):
     """runs the script specified in the cmd parameter"""
     print()
@@ -34,12 +40,6 @@ def start_node_params(script, params, measure=False):
     cmd = f"{utils.get_python_cmd()} {utils.find_file(utils.escape_chars(agentConfig.cfg['baseProjectPath']),script)} {params}"
     print(cmd)
     run_script(cmd, measure)
-
-
-def connect() -> str:
-    masterIp = msg.receive_ip_from_multicast()
-    msg.send_hello()
-    return masterIp
 
 
 def wait_for_instructions():
