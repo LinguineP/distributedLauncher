@@ -65,7 +65,7 @@ def results_listener(host, port, numberOfexpectedClis, stop_event, message_queue
     while not stop_event.is_set():
         try:
             # Wait for a connection
-            server_socket.settimeout(1)
+            server_socket.settimeout(30)
             client_socket, client_address = server_socket.accept()
 
             # Start a new thread to handle the client connection
