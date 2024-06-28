@@ -1,23 +1,35 @@
 # Distributed launcher
 
-This project is supposed to start set processes on remote machines (ie. pyhton scripts)
+This project is supposed to start MPT-FLA aplications on remote machines (link to PTBFLA github https://github.com/miroslav-popovic/ptbfla )
 
 ## Usage:
 ### main operation:
-  1.Copy master node directory to the desired PC
-  2.Copy agents to PCs that are going to run MPT-FLA applications
-  3.Change config for masterNode and for agents according to your preference (also check that you followed along the ptb_fla instalation)
-  4.create new masternodeDB.db file in master/dbs directory in order to start with a clean database
-  5.start the masterNode with python (run masterNode.py)
-  6.either click on a link provided in console or type http://<yourpcslocalip>:8080 into the browser
-  7.click start discovery
+  1. Copy master node directory to the desired PC
+  
+  2. Copy agents to PCs that are going to run MPT-FLA applications
+  
+  3. Change config for masterNode and for agents according to your preference (also check that you followed along the ptb_fla instalation)
+  
+  4. create new masternodeDB.db file in master/dbs directory in order to start with a clean database
+  
+  5. start the masterNode with python (run masterNode.py)
+  
+  6. either click on a link provided in console or type http://<yourpcslocalip>:8080 into the browser
+  
+  7. click start discovery
+  
   8. start your agents with python (run agentNode.py) --note: it may require netifaces if not installed already
+  
   9. stop discovery and proceed with launch 
 ### launch operation:
   1. from the list of available nodes select the nodes you want to start
+ 
   2. long press the node you want to start first
+  
   3. click the application you want to start
+  
   4. click the parameters you want to use
+  
   5. press launch button
 
 
