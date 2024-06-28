@@ -35,6 +35,5 @@ This project is supposed to start MPT-FLA(MicroPython testbed for Federated Lear
 
 ### Contents:
 
-- agents - contains the agent node which is responsible for running the scripts on selected devices
-- fe - contains the frontend code for the destributed launcher which is built and placed into the master/static dir via the buildUtil.py script
-- master - contains the master node which is responsible for the discovery process , control over the agent node actions
+- agents - contains the agent node which is responsible for running the aplication on selected devices
+- master - contains the master node which is responsible for the discovery process , control over the agent node actions, measurement, and measurement analysis
