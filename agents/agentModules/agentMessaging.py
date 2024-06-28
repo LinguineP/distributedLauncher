@@ -17,7 +17,7 @@ agentHostName = ""
 
 
 def generate_offset():
-    return random.uniform(0, 1)
+    return random.uniform(0, 2)
 
 
 def get_local_ip():
