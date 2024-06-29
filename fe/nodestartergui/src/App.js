@@ -11,7 +11,7 @@ function App() {
     switch (activeComponent) {
       case 'Launcher':
         return <LauncherPanel/>;
-      case 'Measurment':
+      case 'Measurement':
         return <MeasurementPanel/>;
       case 'Analysis':
         return <AnalysisPanel/>
