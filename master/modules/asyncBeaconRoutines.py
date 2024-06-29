@@ -34,10 +34,6 @@ async def incomingListener(stop_event, pipe_end):
     pipe_end.send(inNodes)
 
 
-def getAvailableScripts():
-    return getAvailableScripts()
-
-
 def stop_beacon(stop_event):
     print("Stopping worker...")
     stop_event.set()
