@@ -10,7 +10,7 @@ import CommunicationHandler from '../services/communicationHandler.ts';
 
 Modal.setAppElement('#root'); 
 
-function MeasurmentPanel() {
+function MeasurementPanel() {
   const requestHandler = useMemo(() => new CommunicationHandler(), []);
 
   const [selectedSession, setSelectedSession] = useState(null);
@@ -209,4 +209,4 @@ function MeasurmentPanel() {
   );
 }
 
-export default MeasurmentPanel;
+export default MeasurementPanel;

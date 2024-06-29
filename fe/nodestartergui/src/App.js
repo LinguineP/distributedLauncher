@@ -2,7 +2,7 @@ import './App.css';
 import React,{useState} from 'react';
 import LauncherPanel from './panels/LauncherPanel';
 import AnalysisPanel from './panels/AnalysisPanel';
-import MeasurmentPanel from './panels/MeasurementPanel';
+import MeasurementPanel from './panels/MeasurementPanel';
 
 function App() {
    const [activeComponent, setActiveComponent] = useState('Launcher');
@@ -12,7 +12,7 @@ function App() {
       case 'Launcher':
         return <LauncherPanel/>;
       case 'Measurment':
-        return <MeasurmentPanel/>;
+        return <MeasurementPanel/>;
       case 'Analysis':
         return <AnalysisPanel/>
       default:
@@ -34,10 +34,10 @@ function App() {
           </li>
           <li className="nav-item">
             <button
-              className={`nav-button ${activeComponent === 'Measurment' ? 'active' : ''} Attention-text`}
-              onClick={() => setActiveComponent('Measurment')}
+              className={`nav-button ${activeComponent === 'Measurement' ? 'active' : ''} Attention-text`}
+              onClick={() => setActiveComponent('Measurement')}
             >
-              Measurment
+              Measurement
             </button>
           </li>
           <li className="nav-item">
