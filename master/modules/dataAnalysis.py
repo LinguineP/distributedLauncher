@@ -235,7 +235,9 @@ def do_analysis(session_id, session_name):
     analyse_session_batches(session_id, session_name)
     analyse_session(session_id, session_name)
 
-    batchesResultList = db_adapter.batch_results.get_batch_results_for_session
-    sessionResults = db_adapter.session_results.get_session_result_paths
+    batchesResultList = db_adapter.batch_results.get_batch_results_for_session(
+        session_id
+    )
+    sessionResults = db_adapter.session_results.get_session_result_paths(session_id)
 
     return {"sessionResults": sessionResults, "batchesResultList": batchesResultList}
