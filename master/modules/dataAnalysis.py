@@ -16,7 +16,7 @@ db_adapter = dbAdapter.SQLiteDBAdapter()
 
 
 def generate_csv_from_combined_data():
-    # data from all sessions or just from one?
+
     current_datetime = datetime.now()
     filename = current_datetime.strftime("%Y-%m-%d_%H-%M-%S")
     filepathname = utils.escape_chars(f"{cfg['dbPath']}\{'csv'}\{filename}.csv")
@@ -235,7 +235,9 @@ def do_analysis(session_id, session_name):
     analyse_session_batches(session_id, session_name)
     analyse_session(session_id, session_name)
 
-    batchesResultList = db_adapter.batch_results.get_batch_results_for_session
-    sessionResults = db_adapter.session_results.get_session_result_paths
+    batchesResultList = db_adapter.batch_results.get_batch_results_for_session(
+        session_id
+    )
+    sessionResults = db_adapter.session_results.get_session_result_paths(session_id)
 
     return {"sessionResults": sessionResults, "batchesResultList": batchesResultList}
