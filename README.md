@@ -33,6 +33,8 @@ This project is supposed to start MPT-FLA(MicroPython testbed for Federated Lear
   
   5. press launch button
 
+### additional functionalities:
+  Execution time measurement and data analysis
 
 ### Contents:
 
