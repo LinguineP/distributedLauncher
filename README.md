@@ -1,6 +1,7 @@
-# Distributed launcher
+# Distributed launcher, dev branch
 
-This project is supposed to start MPT-FLA(MicroPython testbed for Federated Learning Algorithms) aplications on remote machines (link to PTB-FLA github repository which also contains MPT-FLA as its successor https://github.com/miroslav-popovic/ptbfla )
+This project is supposed to start MPT-FLA(MicroPython testbed for Federated Learning Algorithms) applications on remote machines (link to PTB-FLA github repository which also contains MPT-FLA as its successor https://github.com/miroslav-popovic/ptbfla )
+*If you wish to modify it in any way you wish feel free to fork and modify this branch as it contains the full source code for the project including FE*
 
 ## Usage:
 ### main operation:
