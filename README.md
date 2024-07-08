@@ -15,7 +15,7 @@ This project is supposed to start MPT-FLA(MicroPython testbed for Federated Lear
   
   5. start the masterNode with python (run masterNode.py)
   
-  6. either click on a link provided in console or type http://<yourpcslocalip>:8080 into the browser
+  6. either click on a link provided in console or type http://yourpcslocalip:8080 into the browser
   
   7. click start discovery
   
